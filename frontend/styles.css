@@ -1,3 +1,72 @@
+body {
+
+    background:
+        linear-gradient(
+            rgba(255,255,255,.72),
+            rgba(255,255,255,.72)
+        ),
+        url('images/background.jpg');
+
+    background-size: 450px;
+    background-repeat: repeat;
+
+    padding: 20px;
+
+}
+
+.container {
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 20px;
+
+}
+
+/* =========================
+   HERO / HEADER
+========================= */
+
+.hero {
+
+    text-align: center;
+
+    padding: 30px;
+
+    border-radius: 10px;
+
+    background-color: #f4f4f4;
+
+    margin-top: 25px;
+
+    margin-bottom: 35px;
+
+}
+
+.logo-text {
+
+    font-size: 3rem;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+
+    margin-bottom: 10px;
+
+    text-shadow:
+        2px 2px 0px rgba(0,0,0,.15);
+
+}
+
+.tagline {
+
+    font-size: 1.1rem;
+
+}
+
 h1 {
 
     text-align: center;
@@ -6,19 +75,83 @@ h1 {
 
 }
 
+/* =========================
+   FILTERS
+========================= */
+
+.filters {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    margin-bottom: 40px;
+
+    box-shadow:
+        0px 2px 8px
+        rgba(0,0,0,.1);
+
+}
+
+label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-weight: bold;
+
+}
+
+select {
+
+    padding: 8px;
+
+    min-width: 150px;
+
+}
+
+button {
+
+    padding: 8px 15px;
+
+    cursor: pointer;
+
+}
+
+/* =========================
+   DEAL CARDS
+========================= */
+
 .deal-card {
 
     background: white;
 
-    border-radius: 10px;
-
     padding: 20px;
 
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+
+    border-radius: 12px;
 
     box-shadow:
         0px 2px 8px
-        rgba(0,0,0,0.1);
+        rgba(0,0,0,.1);
+
+    transition: transform .2s ease;
+
+}
+
+.deal-card:hover {
+
+    transform: translateY(-3px);
 
 }
 
@@ -54,110 +187,73 @@ h1 {
 
     padding-top: 10px;
 
+    line-height: 1.6;
+
 }
 
-.hero {
+/* =========================
+   WEBSITE BUTTON
+========================= */
+
+.website-btn {
+
+    display: block;
+
+    width: 100%;
+
+    box-sizing: border-box;
 
     text-align: center;
 
-    padding: 30px;
+    margin-top: 15px;
 
-    border-radius: 10px;
+    padding: 12px 16px;
 
-    background-color: #f4f4f4;
+    border-radius: 6px;
 
-    margin-bottom: 20px;
-
-    margin-top: 25px;
-
-}
-
-.filters {
-
-    background-color: #fafafa;
-
-    margin-bottom: 30px;
-
-    padding: 20px;
-
-    border-radius: 10px;
-
-    box-shadow:
-        0px 2px 5px
-        rgba(0,0,0,0.1);
-
-}
-
-
-.filters {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 15px;
-
-    background: white;
-
-    padding: 20px;
-
-    border-radius: 10px;
-
-    box-shadow:
-        0px 2px 8px
-        rgba(0,0,0,.1);
-
-}
-
-
-select {
-
-    padding: 8px;
-
-    min-width: 150px;
-
-}
-
-.logo-text {
-
-    font-size: 3rem;
+    text-decoration: none;
 
     font-weight: bold;
 
-    letter-spacing: 2px;
+    background-color: #2c6db2;
 
-    text-transform: uppercase;
-
-    margin-bottom: 10px;
-
-    text-shadow:
-        2px 2px 0px rgba(0,0,0,.15);
+    color: white;
 
 }
 
-.tagline {
+.website-btn:hover {
+
+    opacity: .9;
+
+}
+
+/* =========================
+   LOADING / NO RESULTS
+========================= */
+
+.loading {
+
+    text-align: center;
 
     font-size: 1.1rem;
 
-}
-
-
-body {
-
-    background:
-        linear-gradient(
-            rgba(255,255,255,.72),
-            rgba(255,255,255,.72)
-        ),
-        url('images/background.jpg');
-
-    background-size: 450px;
-
-    background-repeat: repeat;
-
-    padding: 20px;
+    padding: 25px;
 
 }
+
+.no-results {
+
+    text-align: center;
+
+    font-size: 1.1rem;
+
+    padding: 25px;
+
+}
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 768px) {
 
@@ -166,64 +262,6 @@ body {
         padding: 15px;
 
     }
-
-}
-
-
-
-label {
-
-    display: block;
-
-    margin-bottom: 5px;
-
-    font-weight: bold;
-
-}
-
-select {
-
-    padding: 5px;
-
-}
-
-button {
-
-    padding: 8px 15px;
-
-    cursor: pointer;
-
-}
-
-.deal-card {
-
-    border: 1px solid #ccc;
-
-    border-radius: 5px;
-
-    padding: 15px;
-
-    margin-bottom: 25px;
-
-}
-
-.deal-card {
-
-    padding: 20px;
-
-    margin-bottom: 20px;
-
-    border-radius: 12px;
-
-    box-shadow:
-        0px 2px 8px
-        rgba(0,0,0,.1);
-
-}
-
-
-
-@media (max-width: 768px) {
 
     .filters {
 
@@ -256,46 +294,5 @@ button {
         font-size: 2rem;
 
     }
-
-}
-
-
-.website-btn {
-
-    display: block;
-
-    text-align: center;
-
-    width: 100%;
-
-    box-sizing: border-box;
-
-    margin-top: 15px;
-
-    padding: 10px 16px;
-
-    border-radius: 6px;
-
-    text-decoration: none;
-
-    font-weight: bold;
-
-    background-color: #2c6db2;
-
-    color: white;
-
-}
-
-.website-btn:hover {
-
-    opacity: .9;
-
-}
-
-.container {
-
-    max-width: 900px;
-
-    margin: 0 auto;
 
 }
