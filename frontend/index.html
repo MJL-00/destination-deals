@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Destination Deals</title>
+
+    <link rel="stylesheet"
+          href="styles.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+    <div class="hero">
+
+        <h1 class="logo-text">
+            Destination Deals
+        </h1>
+
+        <p class="tagline">
+            Discover local savings,
+            activities,
+            shopping,
+            and dining.
+        </p>
+
+    </div>
+
+    <div class="filters">
+
+        <div>
+            <label>Location</label>
+            <select id="locationSelect"></select>
+        </div>
+
+        <div>
+            <label>Category</label>
+
+            <select id="categorySelect">
+
+                <option value="">
+                     Any Category
+                </option>
+
+            </select>
+        </div>
+
+        <div>
+            <label>Day</label>
+
+            <select id="daySelect">
+
+                <option value="">
+                    Any Day
+                </option>
+
+                <option>Sunday</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+
+            </select>
+
+        </div>
+
+        <button id="searchBtn">
+            Search
+        </button>
+
+    </div>
+
+    <hr>
+
+    <div id="results">
+
+    </div>
+
+    <script src="app.js"></script>
+
+    </div>
+</body>
+
+</html>
