@@ -165,6 +165,26 @@ button {
 
 }
 
+.deal-count {
+
+    text-align: center;
+
+    font-weight: bold;
+
+    margin-bottom: 25px;
+
+    padding: 12px;
+
+    background: white;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0px 2px 6px
+        rgba(0,0,0,.08);
+
+}
+
 .business-name {
 
     font-weight: bold;
@@ -190,6 +210,36 @@ button {
     line-height: 1.6;
 
 }
+
+
+.welcome-card {
+
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0px 2px 8px
+        rgba(0,0,0,.1);
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+.welcome-card p {
+
+    margin: 0;
+
+    line-height: 1.6;
+
+}
+
+
+
 
 /* =========================
    WEBSITE BUTTON
@@ -250,6 +300,21 @@ button {
     padding: 25px;
 
 }
+/* =========================
+  sEARCH BUTTON STYLE
+========================= */
+
+button:disabled {
+
+    opacity: .9;
+
+    cursor: not-allowed;
+
+}
+
+
+
+
 
 /* =========================
    MOBILE

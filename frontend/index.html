@@ -42,7 +42,9 @@
 
         <div>
             <label>Location</label>
-            <select id="locationSelect"></select>
+            <select id="locationSelect">
+                <option value="">Select a Location</option>
+            </select>
         </div>
 
         <div>
@@ -78,7 +80,7 @@
 
         </div>
 
-        <button id="searchBtn">
+        <button id="searchBtn" disabled>
             Search
         </button>
 
@@ -88,11 +90,22 @@
 
     <div id="results">
 
+        <div class="welcome-card">
+
+            <p>
+                Select a location and click Search to view local deals.
+            </p>
+
+        </div>
+
     </div>
+
 
     <script src="app.js"></script>
 
     </div>
+
+
 </body>
 
 </html>

@@ -16,6 +16,28 @@ const results =
 
 
 
+// SEARCH BUTTON DISABLED UNTIL LOCATION IS SELECTED
+
+locationSelect.addEventListener(
+    'change',
+    () => {
+
+        if (locationSelect.value) {
+
+            searchBtn.disabled = false;
+
+        } else {
+
+            searchBtn.disabled = true;
+
+        }
+
+    }
+);
+
+
+
+
 // LOAD FUNCTIONS
 
 async function loadLocations() {
@@ -94,6 +116,14 @@ async function searchDeals() {
     const day = daySelect.value;
 
 
+    if (!city) {
+
+    alert('Please select a location.');
+
+    return;
+
+    }
+
     let url = '';
 
         if (category && day) {
@@ -115,7 +145,8 @@ async function searchDeals() {
 
 
 
-
+    results.innerHTML =
+        '<div class="loading">Loading deals...</div>';
 
     const response =
         await fetch(url);
@@ -150,7 +181,18 @@ function formatTime(timeString) {
 
 function displayDeals(deals) {
 
-    results.innerHTML = '';
+    results.innerHTML = `
+
+        <div class="deal-count">
+
+            Showing ${deals.length}
+            deal${deals.length !== 1 ? 's' : ''}
+            in ${locationSelect.value}
+
+        </div>
+
+    `;
+
 
     if (deals.length === 0) {
 
@@ -238,15 +280,3 @@ searchBtn.addEventListener(
 
 
 
-
-
-
-window.onload = () => {
-
-    setTimeout(() => {
-
-        searchDeals();
-
-    }, 500);
-
-};
