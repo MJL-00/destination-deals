@@ -75,6 +75,8 @@ const getDealsByLocation = async (req, res) => {
                 Deal.Description,
                 Location.City,
                 Business.Website,
+                Business.Address,
+                Business.Phone,
                 STRING_AGG(
                     DealSchedule.DayOfWeek,
                     ', '
@@ -106,7 +108,9 @@ const getDealsByLocation = async (req, res) => {
                 Deal.Title,
                 Deal.Description,
                 Location.City,
-                Business.Website
+                Business.Website,
+                Business.Address,
+                Business.Phone
             ORDER BY Business.Name
         `, [city]);
         res.json(result.rows);
@@ -129,6 +133,8 @@ const getDealsByLocationAndCategory = async (req, res) => {
                 Category.CategoryName,
                 Location.City,
                 Business.Website,
+                Business.Address,
+                Business.Phone,
                 STRING_AGG(
                     DealSchedule.DayOfWeek,
                     ', '
@@ -166,7 +172,9 @@ const getDealsByLocationAndCategory = async (req, res) => {
                 Deal.Description,
                 Category.CategoryName,
                 Location.City,
-                Business.Website
+                Business.Website,
+                Business.Address,
+                Business.Phone
             ORDER BY Business.Name
         `, [city, category]);
         res.json(result.rows);
@@ -190,7 +198,9 @@ const getDealsByLocationAndDay = async (req, res) => {
                 DealSchedule.StartTime,
                 DealSchedule.EndTime,
                 Location.City,
-                Business.Website
+                Business.Website,
+                Business.Address,
+                Business.Phone
             FROM Deal
             JOIN Business
                 ON Deal.BusinessID = Business.BusinessID
@@ -227,7 +237,9 @@ const getDealsByLocationCategoryAndDay = async (req, res) => {
                 DealSchedule.StartTime,
                 DealSchedule.EndTime,
                 Location.City,
-                Business.Website
+                Business.Website,
+                Business.Address,
+                Business.Phone
             FROM Deal
             JOIN Business
                 ON Deal.BusinessID = Business.BusinessID

@@ -1,3 +1,9 @@
+* {
+    box-sizing: border-box;
+}
+
+
+
 body {
 
     background:
@@ -11,6 +17,8 @@ body {
     background-repeat: repeat;
 
     padding: 20px;
+
+    font-family: Arial, Helvetica, sans-serif;
 
 }
 
@@ -27,26 +35,29 @@ body {
 /* =========================
    HERO / HEADER
 ========================= */
-
 .hero {
 
     text-align: center;
 
     padding: 30px;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
-    background-color: #f4f4f4;
+    background-color: rgba(255,255,255,.92);
 
     margin-top: 25px;
 
     margin-bottom: 35px;
 
+    width: 100%;
+
+    box-sizing: border-box;
+
 }
 
 .logo-text {
 
-    font-size: 3rem;
+    font-size: clamp(2rem, 8vw, 4rem);
 
     font-weight: bold;
 
@@ -59,11 +70,21 @@ body {
     text-shadow:
         2px 2px 0px rgba(0,0,0,.15);
 
+    overflow-wrap: break-word;
+
+    word-break: break-word;
+
 }
 
 .tagline {
 
     font-size: 1.1rem;
+
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    line-height: 1.5;
 
 }
 
@@ -71,7 +92,7 @@ h1 {
 
     text-align: center;
 
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 
 }
 
@@ -87,17 +108,27 @@ h1 {
 
     gap: 15px;
 
-    background: white;
+    align-items: end;
+
+    background: rgba(255,255,255,.95);
 
     padding: 20px;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
     margin-bottom: 40px;
 
     box-shadow:
         0px 2px 8px
         rgba(0,0,0,.1);
+
+}
+
+.filters > div {
+
+    flex: 1;
+
+    min-width: 180px;
 
 }
 
@@ -113,17 +144,23 @@ label {
 
 select {
 
-    padding: 8px;
+    width: 100%;
 
-    min-width: 150px;
+    padding: 10px;
+
+    box-sizing: border-box;
 
 }
 
 button {
 
-    padding: 8px 15px;
+    padding: 10px 20px;
 
     cursor: pointer;
+
+    border-radius: 6px;
+
+    border: 1px solid #ccc;
 
 }
 
@@ -137,7 +174,7 @@ button {
 
     padding: 20px;
 
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 
     border-radius: 12px;
 
@@ -147,6 +184,15 @@ button {
 
     transition: transform .2s ease;
 
+    width: 100%;
+    max-width: 100%;
+
+}
+
+
+.deal-card p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .deal-card:hover {
@@ -163,7 +209,13 @@ button {
 
     align-items: center;
 
+    gap: 15px;
+
 }
+
+
+
+
 
 .deal-count {
 
@@ -185,11 +237,27 @@ button {
 
 }
 
-.business-name {
+.business-header {
 
-    font-weight: bold;
+    margin: 0;
 
-    color: #555;
+    font-size: 1.8rem;
+
+    font-weight: 700;
+
+}
+
+.deal-title {
+
+    margin-top: 8px;
+
+    margin-bottom: 15px;
+
+    color: #666;
+
+    font-style: italic;
+
+    font-size: 1rem;
 
 }
 
@@ -205,12 +273,11 @@ button {
 
     border-top: 1px solid #ddd;
 
-    padding-top: 10px;
+    padding-top: 12px;
 
     line-height: 1.6;
 
 }
-
 
 .welcome-card {
 
@@ -238,26 +305,32 @@ button {
 
 }
 
-
-
-
 /* =========================
-   WEBSITE BUTTON
+   BUTTON AREA
 ========================= */
 
-.website-btn {
+.card-footer {
 
-    display: block;
+    display: flex;
 
-    width: 100%;
-
-    box-sizing: border-box;
-
-    text-align: center;
+    gap: 10px;
 
     margin-top: 15px;
 
-    padding: 12px 16px;
+    flex-wrap: wrap;
+
+}
+
+.website-btn,
+.directions-btn {
+
+    flex: 1;
+
+    min-width: 140px;
+
+    text-align: center;
+
+    padding: 12px;
 
     border-radius: 6px;
 
@@ -265,13 +338,24 @@ button {
 
     font-weight: bold;
 
-    background-color: #2c6db2;
-
     color: white;
 
 }
 
-.website-btn:hover {
+.website-btn {
+
+    background-color: #2c6db2;
+
+}
+
+.directions-btn {
+
+    background-color: #4a7c59;
+
+}
+
+.website-btn:hover,
+.directions-btn:hover {
 
     opacity: .9;
 
@@ -300,21 +384,18 @@ button {
     padding: 25px;
 
 }
+
 /* =========================
-  sEARCH BUTTON STYLE
+   SEARCH BUTTON
 ========================= */
 
 button:disabled {
 
-    opacity: .9;
+    opacity: .5;
 
     cursor: not-allowed;
 
 }
-
-
-
-
 
 /* =========================
    MOBILE
@@ -324,7 +405,19 @@ button:disabled {
 
     body {
 
-        padding: 15px;
+        padding: 10px;
+
+    }
+
+    .container {
+
+        padding: 10px;
+
+    }
+
+    .hero {
+
+        padding: 25px 20px;
 
     }
 
@@ -332,17 +425,31 @@ button:disabled {
 
         flex-direction: column;
 
+        width: 100%;
+
+        box-sizing: border-box;
+
+    }
+
+    .filters > div {
+
+        width: 100%;
+
     }
 
     select {
 
         width: 100%;
 
+        box-sizing: border-box;
+
     }
 
     button {
 
         width: 100%;
+
+        box-sizing: border-box;
 
     }
 
@@ -354,9 +461,27 @@ button:disabled {
 
     }
 
+}
+
+/* =========================
+   Extra small MOBILE
+========================= */
+
+@media (max-width: 400px) {
+
     .logo-text {
 
         font-size: 2rem;
+
+        letter-spacing: 1px;
+
+    }
+
+    .tagline {
+
+        font-size: 1rem;
+
+        line-height: 1.5;
 
     }
 

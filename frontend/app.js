@@ -4,8 +4,7 @@ const daySelect = document.getElementById('daySelect');
 const searchBtn = document.getElementById('searchBtn');
 const results = document.getElementById('results');
 
-// Live Production API Link
-const API_URL = 'https://destination-deals.onrender.com';
+
 
 // SEARCH BUTTON DISABLED UNTIL LOCATION IS SELECTED
 locationSelect.addEventListener('change', () => {
@@ -105,21 +104,41 @@ function displayDeals(deals) {
 
         card.innerHTML = `
             <div class="deal-header">
-                <h3>${deal.title}</h3>
-                <span class="business-name">${deal.name}</span>
+                <h3 class="business-header">${deal.name}</h3>
+                <div class="deal-title">${deal.title}</div>
             </div>
+
             <p class="description">${deal.description}</p>
+            <p class="address"><strong>Address: </strong>${deal.address}</p>
             <div class="deal-details">
                 <p><strong>Days:</strong> ${deal.dayofweek}</p>
                 <p><strong>Time:</strong> ${formatTime(deal.starttime)} - ${formatTime(deal.endtime)}</p>
             </div>
-            ${deal.website ? `
-                <div class="card-footer">
-                    <a href="https://${deal.website}" target="_blank" class="website-btn">
+            <div class="card-footer">
+
+                ${deal.website ? `
+
+                    <a
+                        href="https://${deal.website}"
+                        target="_blank"
+                        class="website-btn">
+
                         Visit Website
+
                     </a>
-                </div>
-            ` : ''}
+
+                ` : ''}
+
+                <a
+                    href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(deal.address)}"
+                    target="_blank"
+                    class="directions-btn">
+
+                    Get Directions
+
+                </a>
+
+            </div>
         `;
         results.appendChild(card);
     });
