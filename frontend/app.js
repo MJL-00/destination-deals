@@ -4,8 +4,6 @@ const daySelect = document.getElementById('daySelect');
 const searchBtn = document.getElementById('searchBtn');
 const results = document.getElementById('results');
 
-
-
 // SEARCH BUTTON DISABLED UNTIL LOCATION IS SELECTED
 locationSelect.addEventListener('change', () => {
     if (locationSelect.value) {
@@ -102,6 +100,12 @@ function displayDeals(deals) {
         const card = document.createElement('div');
         card.classList.add('deal-card');
 
+        // Compile Option A layout elements safely for local search targeting
+        const street = deal.address || '';
+        const city = deal.city || '';
+        const state = deal.state || '';
+        const fullSearchAddress = `${street}, ${city}, ${state}`;
+
         card.innerHTML = `
             <div class="deal-header">
                 <h3 class="business-header">${deal.name}</h3>
@@ -109,7 +113,7 @@ function displayDeals(deals) {
             </div>
 
             <p class="description">${deal.description}</p>
-            <p class="address"><strong>Address: </strong>${deal.address}</p>
+            <p class="address"><strong>Address: </strong>${street}, ${city}, ${state}</p>
             <div class="deal-details">
                 <p><strong>Days:</strong> ${deal.dayofweek}</p>
                 <p><strong>Time:</strong> ${formatTime(deal.starttime)} - ${formatTime(deal.endtime)}</p>
@@ -117,25 +121,19 @@ function displayDeals(deals) {
             <div class="card-footer">
 
                 ${deal.website ? `
-
                     <a
-                        href="https://${deal.website}"
+                        href="${deal.website}"
                         target="_blank"
                         class="website-btn">
-
                         Visit Website
-
                     </a>
-
                 ` : ''}
 
                 <a
-                    href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(deal.address)}"
+                    href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullSearchAddress)}"
                     target="_blank"
                     class="directions-btn">
-
                     Get Directions
-
                 </a>
 
             </div>

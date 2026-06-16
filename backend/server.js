@@ -7,6 +7,10 @@ const businessRoutes = require('./routes/businessRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 
+
+const pool = require('./db'); // Tells server.js what "pool" means!
+
+
 const app = express();
 
 app.use(express.json());
@@ -21,13 +25,6 @@ app.use('/businesses', businessRoutes);
 app.use('/locations', locationRoutes);
 app.use('/categories', categoryRoutes);
 
-// 2. Use the environment port, defaulting to 3000 for local development
-const PORT = process.env.PORT || 3000; 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-
 
 app.get('/dbcheck', async (req, res) => {
 
@@ -38,3 +35,14 @@ app.get('/dbcheck', async (req, res) => {
     res.json(result.rows);
 
 });
+
+
+
+// 2. Use the environment port, defaulting to 3000 for local development
+const PORT = process.env.PORT || 3000; 
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+
+
+

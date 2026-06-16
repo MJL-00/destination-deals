@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Deals</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f8f9fa; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #28a745; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { border-color: #85d7a7; outline: 0; box-shadow: 0 0 0 0.2rem rgba(40,167,69,.25); }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f1f3f5; padding: 15px; border-radius: 4px; border: 1px solid #dee2e6; }
+        .checkbox-item { display: flex; align-items: center; font-size: 14px; }
+        .checkbox-item input { width: auto; margin-right: 8px; }
+        .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+        button:hover { background-color: #218838; }
+        .message { margin-top: 20px; padding: 12px; border-radius: 4px; display: none; font-size: 14px; font-weight: 500; }
+        .nav-links { margin-top: 20px; text-align: center; }
+        .nav-links a { color: #6c757d; text-decoration: none; font-size: 14px; }
+        .nav-links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Deal</h2>
+        <form id="dealForm">
+            <div class="form-group">
+                <label>Search & Select Business *</label>
+                <input type="text" id="businessSearch" list="businessDataList" placeholder="Type business name..." required>
+                <datalist id="businessDataList"></datalist>
+            </div>
+            <div class="form-group">
+                <label>Deal Title *</label>
+                <input type="text" id="title" maxlength="150" required placeholder="e.g., Half Off Appetizers">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" rows="3" maxlength="255" placeholder="Details regarding constraints..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Assign Categories</label>
+                <div id="categoryCheckboxes" class="checkbox-group">Loading categories...</div>
+            </div>
+
+            <div class="form-group">
+                <label>Active Days (Schedule) *</label>
+                <div class="checkbox-group" id="dayCheckboxes">
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Monday" id="day_mon"><label for="day_mon"> Monday</label></div>
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Tuesday" id="day_tue"><label for="day_tue"> Tuesday</label></div>
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Wednesday" id="day_wed"><label for="day_wed"> Wednesday</label></div>
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Thursday" id="day_thu"><label for="day_thu"> Thursday</label></div>
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Friday" id="day_fri"><label for="day_fri"> Friday</label></div>
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Saturday" id="day_sat"><label for="day_sat"> Saturday</label></div>
+                    <div class="checkbox-item"><input type="checkbox" name="days" value="Sunday" id="day_sun"><label for="day_sun"> Sunday</label></div>
+                </div>
+            </div>
+
+            <div class="time-row">
+                <div class="form-group">
+                    <label>Start Time *</label>
+                    <input type="time" id="starttime" step="1800" value="09:00" required>
+                </div>
+                <div class="form-group">
+                    <label>End Time *</label>
+                    <input type="time" id="endtime" step="1800" value="21:00" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Discount Type *</label>
+                <select id="discounttype" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="Percent">Percent (% Off)</option>
+                    <option value="Flat">Flat ($ Off)</option>
+                    <option value="BOGO">BOGO (Buy One, Get One)</option>
+                    <option value="Custom">Custom / Special Promo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Discount Value (Optional)</label>
+                <input type="number" id="discountvalue" step="0.01" placeholder="e.g., 15.00">
+            </div>
+            <button type="submit">Save Deal</button>
+        </form>
+
+        <div id="msgBox" class="message"></div>
+        <div class="nav-links"><a href="businesses.html">← Back to Business Management</a></div>
+    </div>
+
+    <script>
+        let businessMap = {}; 
+
+        async function initPageData() {
+            try {
+                const bizRes = await fetch('http://localhost:3000/businesses/lookup');
+                const businesses = await bizRes.json();
+                const datalist = document.getElementById('businessDataList');
+                datalist.innerHTML = '';
+                businessMap = {};
+                businesses.forEach(b => {
+                    const option = document.createElement('option');
+                    option.value = b.name;
+                    datalist.appendChild(option);
+                    businessMap[b.name] = b.businessid; 
+                });
+
+                const catRes = await fetch('http://localhost:3000/categories/lookup');
+                const categories = await catRes.json();
+                const checkboxContainer = document.getElementById('categoryCheckboxes');
+                checkboxContainer.innerHTML = '';
+                categories.forEach(c => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'checkbox-item';
+                    wrap.innerHTML = `<input type="checkbox" name="categories" value="${c.categoryid}" id="cat_${c.categoryid}">
+                                      <label for="cat_${c.categoryid}" style="display:inline; font-weight:normal;"> ${c.categoryname}</label>`;
+                    checkboxContainer.appendChild(wrap);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.getElementById('dealForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgBox = document.getElementById('msgBox');
+            msgBox.style.display = 'none';
+            
+            const typedName = document.getElementById('businessSearch').value;
+            const verifiedId = businessMap[typedName];
+
+            if (!verifiedId) {
+                msgBox.style.backgroundColor = '#f8d7da';
+                msgBox.style.color = '#721c24';
+                msgBox.innerText = "Error: Select a valid business from the dropdown suggestions.";
+                msgBox.style.display = 'block';
+                return;
+            }
+
+            const checkedBoxes = document.querySelectorAll('input[name="categories"]:checked');
+            const categoryIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+
+            const checkedDays = document.querySelectorAll('input[name="days"]:checked');
+            const activeDays = Array.from(checkedDays).map(cb => cb.value);
+
+            if (activeDays.length === 0) {
+                msgBox.style.backgroundColor = '#f8d7da';
+                msgBox.style.color = '#721c24';
+                msgBox.innerText = "Error: Please select at least one active day for this deal.";
+                msgBox.style.display = 'block';
+                return;
+            }
+
+            const payload = {
+                businessid: verifiedId,
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value || null,
+                discounttype: document.getElementById('discounttype').value,
+                discountvalue: document.getElementById('discountvalue').value ? parseFloat(document.getElementById('discountvalue').value) : null,
+                isactive: true,
+                categoryIds: categoryIds,
+                activeDays: activeDays,
+                starttime: document.getElementById('starttime').value || null,
+                endtime: document.getElementById('endtime').value || null
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/deals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    msgBox.style.backgroundColor = '#d4edda';
+                    msgBox.style.color = '#155724';
+                    msgBox.innerText = data.message;
+                    document.getElementById('dealForm').reset();
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                msgBox.style.backgroundColor = '#f8d7da';
+                msgBox.style.color = '#721c24';
+                msgBox.innerText = err.message;
+            }
+            msgBox.style.display = 'block';
+        });
+
+        initPageData();
+    </script>
+</body>
+</html>
