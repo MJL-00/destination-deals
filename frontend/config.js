@@ -12,9 +12,7 @@ const API_URL = 'https://destination-deals.onrender.com';
 
 
 
-
-// Development
-const API_URL = 'http://localhost:3000';
-
-// Production
-// const API_URL = 'https://destination-deals.onrender.com';
+const API_URL =
+    window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://destination-deals.onrender.com';
