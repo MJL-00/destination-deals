@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Manage Businesses</title>
+    <title>Admin - Add Business</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f8f9fa; color: #333; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -35,19 +35,16 @@
                 <label>Street Address *</label>
                 <input type="text" id="address" maxlength="255" required placeholder="e.g., 345 Thames St">
             </div>
-
             <div class="form-group">
                 <label>Assigned Region/City *</label>
                 <select id="locationid" required>
                     <option value="">-- Loading Registered Locations --</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label>Assign Business Categories *</label>
                 <div id="categoryCheckboxes" class="checkbox-group">Loading registered categories...</div>
             </div>
-
             <div class="form-group">
                 <label>Phone Number</label>
                 <input type="tel" id="phone" maxlength="20" placeholder="(401) 555-0199">
@@ -56,7 +53,6 @@
                 <label>Website URL</label>
                 <input type="url" id="website" maxlength="255" placeholder="https://www.example.com">
             </div>
-
             <div class="form-group">
                 <label>Subscription Tier</label>
                 <select id="subscription_tier">
@@ -64,14 +60,14 @@
                     <option value="Premium">Premium</option>
                 </select>
             </div>
-
             <button type="submit">Save Business Storefront</button>
         </form>
 
         <div id="msgBox" class="message"></div>
         <div class="nav-links">
             <a href="index.html">← Dashboard</a>
-            <a href="deals.html">→ Deal Management</a>
+            <a href="add-deal.html">→ Add a Deal</a>
+            <a href="businesses-list.html">→ View All Businesses</a>
         </div>
     </div>
 
@@ -101,7 +97,6 @@
                                       <label for="cat_${cat.categoryid}"> ${cat.categoryname}</label>`;
                     catContainer.appendChild(wrap);
                 });
-
             } catch (err) {
                 console.error("Could not fetch form configuration lists.", err);
                 document.getElementById('locationid').innerHTML = '<option value="">Error loading regions</option>';
@@ -142,7 +137,6 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
-
                 if (response.ok) {
                     msgBox.style.cssText = 'display:block; background:#d4edda; color:#155724; border:1px solid #c3e6cb;';
                     msgBox.innerText = data.message;

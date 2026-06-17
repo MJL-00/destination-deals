@@ -299,13 +299,127 @@ const createDeal = async (req, res) => {
     }
 };
 
+
+
+
+// GET SINGLE DEAL BY ID
+const getDealById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query(`
+            SELECT
+                d.*,
+                b.name AS business_name,
+                STRING_AGG(DISTINCT c.categoryname, ', ') AS categories,
+                STRING_AGG(DISTINCT ds.dayofweek, ', '
+                    ORDER BY ds.dayofweek) AS days,
+                MIN(ds.starttime) AS starttime,
+                MAX(ds.endtime)   AS endtime
+            FROM deal d
+            JOIN business b ON d.businessid = b.businessid
+            LEFT JOIN dealcategory dc ON d.dealid = dc.dealid
+            LEFT JOIN category c ON dc.categoryid = c.categoryid
+            LEFT JOIN dealschedule ds ON d.dealid = ds.dealid
+            WHERE d.dealid = $1
+            GROUP BY d.dealid, b.name
+        `, [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Deal not found.' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server Error' });
+    }
+};
+
+// GET ALL DEALS (enriched with business name + schedule summary)
+const getAllDealsEnriched = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                d.*,
+                b.name AS business_name,
+                STRING_AGG(DISTINCT c.categoryname, ', ') AS categories,
+                STRING_AGG(DISTINCT ds.dayofweek, ', '
+                    ORDER BY ds.dayofweek) AS days,
+                MIN(ds.starttime) AS starttime,
+                MAX(ds.endtime)   AS endtime
+            FROM deal d
+            JOIN business b ON d.businessid = b.businessid
+            LEFT JOIN dealcategory dc ON d.dealid = dc.dealid
+            LEFT JOIN category c ON dc.categoryid = c.categoryid
+            LEFT JOIN dealschedule ds ON d.dealid = ds.dealid
+            GROUP BY d.dealid, b.name
+            ORDER BY d.dealid DESC
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server Error' });
+    }
+};
+
+// TOGGLE isactive FLAG
+const toggleDealActive = async (req, res) => {
+    const { id } = req.params;
+    const { isactive } = req.body;
+    try {
+        const result = await pool.query(
+            'UPDATE deal SET isactive = $1 WHERE dealid = $2 RETURNING dealid, title, isactive',
+            [isactive, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Deal not found.' });
+        }
+        res.json({ message: `Deal ${isactive ? 'activated' : 'deactivated'} successfully.`, deal: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error updating deal status.' });
+    }
+};
+
+// DELETE DEAL (cascade junction rows)
+const deleteDeal = async (req, res) => {
+    const { id } = req.params;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        await client.query('DELETE FROM dealcategory  WHERE dealid = $1', [id]);
+        await client.query('DELETE FROM dealschedule  WHERE dealid = $1', [id]);
+        const result = await client.query(
+            'DELETE FROM deal WHERE dealid = $1 RETURNING dealid, title',
+            [id]
+        );
+        if (result.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Deal not found.' });
+        }
+        await client.query('COMMIT');
+        res.json({ message: `Deal "${result.rows[0].title}" deleted successfully.` });
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ error: 'Server error deleting deal.' });
+    } finally {
+        client.release();
+    }
+};
+
+
+
+
+
 module.exports = {
-    getAllDeals,
+    getAllDealsEnriched,
     getDealsByDay,
     getDealsByCategory,
     getDealsByLocation,
     getDealsByLocationAndCategory,
     getDealsByLocationAndDay,
     getDealsByLocationCategoryAndDay,
-    createDeal
+    createDeal,
+    getDealById,
+    toggleDealActive,
+    deleteDeal
 };

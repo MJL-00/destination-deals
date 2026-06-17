@@ -6,243 +6,76 @@
     <title>Admin - Dashboard</title>
     <style>
         * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-
-        /* ── Top nav bar ── */
-        .topnav {
-            background: #fff;
-            border-bottom: 2px solid #e9ecef;
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 56px;
-        }
-        .topnav .brand {
-            font-size: 18px;
-            font-weight: 700;
-            color: #343a40;
-            text-decoration: none;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        .topnav { background: #fff; border-bottom: 2px solid #e9ecef; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+        .topnav .brand { font-size: 18px; font-weight: 700; color: #343a40; text-decoration: none; }
         .topnav .brand span { color: #007BFF; }
-        .topnav .nav-links {
-            display: flex;
-            gap: 8px;
-        }
-        .topnav .nav-links a {
-            padding: 6px 14px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            color: #495057;
-            transition: background 0.15s;
-        }
+        .topnav .nav-links { display: flex; gap: 8px; }
+        .topnav .nav-links a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; color: #495057; transition: background 0.15s; }
         .topnav .nav-links a:hover { background: #f1f3f5; }
-        .topnav .nav-links a.active {
-            background: #e7f1ff;
-            color: #007BFF;
-        }
-
-        /* ── Page body ── */
+        .topnav .nav-links a.active { background: #e7f1ff; color: #007BFF; }
         .page { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-
         .page-header { margin-bottom: 28px; }
         .page-header h1 { margin: 0 0 4px; font-size: 24px; color: #343a40; }
-        .page-header p  { margin: 0; color: #6c757d; font-size: 14px; }
-
-        /* ── Stat cards ── */
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 16px;
-            margin-bottom: 36px;
-        }
-        .stat-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-            padding: 20px 24px;
-            border-top: 4px solid #dee2e6;
-        }
+        .page-header p { margin: 0; color: #6c757d; font-size: 14px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 36px; }
+        .stat-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); padding: 20px 24px; border-top: 4px solid #dee2e6; }
         .stat-card.blue   { border-top-color: #007BFF; }
         .stat-card.green  { border-top-color: #28a745; }
         .stat-card.orange { border-top-color: #fd7e14; }
         .stat-card.red    { border-top-color: #dc3545; }
-
-        .stat-card .stat-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: #6c757d;
-            margin-bottom: 8px;
-        }
-        .stat-card .stat-value {
-            font-size: 36px;
-            font-weight: 700;
-            line-height: 1;
-            color: #343a40;
-        }
-        .stat-card .stat-value.loading { color: #adb5bd; font-size: 28px; }
-        .stat-card .stat-sub {
-            font-size: 12px;
-            color: #adb5bd;
-            margin-top: 6px;
-        }
-
-        /* ── Section headers ── */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-        }
-        .section-header h2 {
-            margin: 0;
-            font-size: 16px;
-            color: #343a40;
-        }
-        .section-header a {
-            font-size: 13px;
-            color: #007BFF;
-            text-decoration: none;
-        }
+        .stat-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #6c757d; margin-bottom: 8px; }
+        .stat-value { font-size: 36px; font-weight: 700; line-height: 1; color: #343a40; }
+        .stat-value.loading { color: #adb5bd; font-size: 28px; }
+        .stat-sub { font-size: 12px; color: #adb5bd; margin-top: 6px; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .section-header h2 { margin: 0; font-size: 16px; color: #343a40; }
+        .section-header a { font-size: 13px; color: #007BFF; text-decoration: none; }
         .section-header a:hover { text-decoration: underline; }
-
-        /* ── Quick action buttons ── */
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 36px;
-        }
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 16px 18px;
-            text-decoration: none;
-            color: #343a40;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: box-shadow 0.15s, border-color 0.15s;
-        }
-        .action-btn:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-color: #adb5bd;
-        }
-        .action-btn .btn-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 36px; }
+        .action-btn { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px 18px; text-decoration: none; color: #343a40; font-size: 14px; font-weight: 600; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s; }
+        .action-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-color: #adb5bd; }
+        .btn-icon { width: 38px; height: 38px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
         .btn-icon.blue   { background: #e7f1ff; color: #007BFF; }
         .btn-icon.green  { background: #e9f7ec; color: #28a745; }
         .btn-icon.orange { background: #fff3e8; color: #fd7e14; }
         .btn-icon.red    { background: #fde8e8; color: #dc3545; }
-        .action-btn .btn-sub {
-            display: block;
-            font-size: 12px;
-            font-weight: 400;
-            color: #6c757d;
-            margin-top: 2px;
-        }
-
-        /* ── Deals table ── */
-        .table-wrap {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-            overflow: hidden;
-            margin-bottom: 40px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        thead th {
-            background: #f8f9fa;
-            text-align: left;
-            padding: 10px 16px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            color: #6c757d;
-            border-bottom: 2px solid #e9ecef;
-            white-space: nowrap;
-        }
+        .btn-sub { display: block; font-size: 12px; font-weight: 400; color: #6c757d; margin-top: 2px; }
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 40px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th { background: #f8f9fa; text-align: left; padding: 10px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #6c757d; border-bottom: 2px solid #e9ecef; white-space: nowrap; }
         tbody tr { border-bottom: 1px solid #f1f3f5; }
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #f8f9fa; }
         tbody td { padding: 10px 16px; vertical-align: middle; }
-
-        .badge {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 9px;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-        .badge-active   { background: #e9f7ec; color: #1e7e34; }
-        .badge-inactive { background: #f1f3f5; color: #6c757d; }
-        .badge-premium  { background: #e7f1ff; color: #0056b3; }
-        .badge-basic    { background: #fff3e8; color: #b25500; }
-        .badge-verified { background: #e9f7ec; color: #1e7e34; }
+        .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+        .badge-active     { background: #e9f7ec; color: #1e7e34; }
+        .badge-inactive   { background: #f1f3f5; color: #6c757d; }
+        .badge-premium    { background: #e7f1ff; color: #0056b3; }
+        .badge-basic      { background: #fff3e8; color: #b25500; }
+        .badge-verified   { background: #e9f7ec; color: #1e7e34; }
         .badge-unverified { background: #fde8e8; color: #b02a2a; }
-
-        .empty-row td {
-            text-align: center;
-            color: #adb5bd;
-            padding: 32px;
-            font-size: 14px;
-        }
-
-        /* ── Footer note ── */
-        .footer-note {
-            text-align: center;
-            font-size: 12px;
-            color: #adb5bd;
-            margin-bottom: 40px;
-        }
+        .empty-row td { text-align: center; color: #adb5bd; padding: 32px; font-size: 14px; }
+        .footer-note { text-align: center; font-size: 12px; color: #adb5bd; margin-bottom: 40px; }
     </style>
 </head>
 <body>
 
-<!-- Top navigation -->
 <nav class="topnav">
     <a class="brand" href="index.html">Destination <span>Deals</span> Admin</a>
     <div class="nav-links">
         <a href="index.html" class="active">Dashboard</a>
-        <a href="businesses.html">Businesses</a>
-        <a href="deals.html">Deals</a>
+        <a href="businesses-list.html">Businesses</a>
+        <a href="deals-list.html">Deals</a>
     </div>
 </nav>
 
 <div class="page">
-
     <div class="page-header">
         <h1>Dashboard</h1>
         <p id="today-date">Loading...</p>
     </div>
 
-    <!-- Stat cards -->
     <div class="stat-grid">
         <div class="stat-card blue">
             <div class="stat-label">Registered Businesses</div>
@@ -266,45 +99,29 @@
         </div>
     </div>
 
-    <!-- Quick actions -->
-    <div class="section-header">
-        <h2>Quick Actions</h2>
-    </div>
+    <div class="section-header"><h2>Quick Actions</h2></div>
     <div class="action-grid">
-        <a href="businesses.html" class="action-btn">
+        <a href="add-business.html" class="action-btn">
             <div class="btn-icon blue">＋</div>
-            <div>
-                Add Business
-                <span class="btn-sub">Register a new storefront</span>
-            </div>
+            <div>Add Business<span class="btn-sub">Register a new storefront</span></div>
         </a>
-        <a href="deals.html" class="action-btn">
+        <a href="add-deal.html" class="action-btn">
             <div class="btn-icon green">🏷</div>
-            <div>
-                Add Deal
-                <span class="btn-sub">Post a new promotion</span>
-            </div>
+            <div>Add Deal<span class="btn-sub">Post a new promotion</span></div>
         </a>
-        <a href="businesses.html#unverified" class="action-btn">
+        <a href="businesses-list.html?filter=unverified" class="action-btn">
             <div class="btn-icon orange">✓</div>
-            <div>
-                Verify Businesses
-                <span class="btn-sub">Review pending storefronts</span>
-            </div>
+            <div>Verify Businesses<span class="btn-sub">Review pending storefronts</span></div>
         </a>
-        <a href="deals.html#inactive" class="action-btn">
+        <a href="deals-list.html?filter=inactive" class="action-btn">
             <div class="btn-icon red">⚠</div>
-            <div>
-                Inactive Deals
-                <span class="btn-sub">Review or reactivate</span>
-            </div>
+            <div>Inactive Deals<span class="btn-sub">Review or reactivate</span></div>
         </a>
     </div>
 
-    <!-- Recent deals table -->
     <div class="section-header">
         <h2>Recent Deals</h2>
-        <a href="deals.html">View all →</a>
+        <a href="deals-list.html">View all →</a>
     </div>
     <div class="table-wrap">
         <table>
@@ -324,10 +141,9 @@
         </table>
     </div>
 
-    <!-- Recent businesses table -->
     <div class="section-header">
         <h2>Recent Businesses</h2>
-        <a href="businesses.html">View all →</a>
+        <a href="businesses-list.html">View all →</a>
     </div>
     <div class="table-wrap">
         <table>
@@ -349,93 +165,59 @@
     <div class="footer-note" id="footer-note"></div>
 </div>
 
-<!-- Load shared config first so API_URL is available -->
 <script src="../config.js"></script>
 <script>
-    // ── Date ─────────────────────────────────────────────────────
     document.getElementById('today-date').textContent =
-        new Date().toLocaleDateString('en-US', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
+        new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // ── Helpers ───────────────────────────────────────────────────
     function setStatValue(id, value) {
         const el = document.getElementById(id);
         el.textContent = value;
         el.classList.remove('loading');
     }
-
     function setStatError(id) {
         const el = document.getElementById(id);
         el.textContent = 'N/A';
         el.classList.remove('loading');
     }
 
-    // ── Load stat cards ───────────────────────────────────────────
     async function loadStats() {
         try {
-            // Businesses: total count and unverified count
             const bizRes = await fetch(`${API_URL}/businesses`);
             const businesses = await bizRes.json();
             setStatValue('stat-businesses', businesses.length);
-
-            // is_verified column exists after migration; guard for pre-migration state
-            const unverified = businesses.filter(b =>
-                b.is_verified === false || b.is_verified === 'false'
-            );
+            const unverified = businesses.filter(b => b.is_verified === false || b.is_verified === 'false');
             setStatValue('stat-unverified', unverified.length);
-
         } catch (e) {
-            console.warn('Business stats failed:', e.message);
             setStatError('stat-businesses');
             setStatError('stat-unverified');
         }
-
         try {
-            // Deals: active count and total click_count
             const dealRes = await fetch(`${API_URL}/deals`);
             const deals = await dealRes.json();
-
-            const activeDeals = deals.filter(d => d.isactive === true);
-            setStatValue('stat-active-deals', activeDeals.length);
-
-            // click_count only exists after migration; fall back to 0
-            const totalClicks = deals.reduce((sum, d) => sum + (d.click_count || 0), 0);
-            setStatValue('stat-clicks', totalClicks.toLocaleString());
-
+            setStatValue('stat-active-deals', deals.filter(d => d.isactive === true).length);
+            setStatValue('stat-clicks', deals.reduce((sum, d) => sum + (d.click_count || 0), 0).toLocaleString());
         } catch (e) {
-            console.warn('Deal stats failed:', e.message);
             setStatError('stat-active-deals');
             setStatError('stat-clicks');
         }
     }
 
-    // ── Load recent deals table ───────────────────────────────────
     async function loadRecentDeals() {
         const tbody = document.getElementById('deals-tbody');
         try {
-            const res = await fetch(`${API_URL}/deals`);
-            const deals = await res.json();
-
+            const deals = await (await fetch(`${API_URL}/deals`)).json();
             if (!deals.length) {
                 tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No deals found. Add your first deal.</td></tr>';
                 return;
             }
-
-            // Show up to the last 8 deals (most recently inserted = highest dealid)
-            const recent = [...deals]
-                .sort((a, b) => b.dealid - a.dealid)
-                .slice(0, 8);
-
-            tbody.innerHTML = recent.map(d => {
+            tbody.innerHTML = [...deals].sort((a, b) => b.dealid - a.dealid).slice(0, 8).map(d => {
                 const discount = d.discountvalue
                     ? (d.discounttype === 'Percent' ? `${d.discountvalue}% off` : `$${d.discountvalue} off`)
                     : d.discounttype || '—';
-
                 const statusBadge = d.isactive
                     ? '<span class="badge badge-active">Active</span>'
                     : '<span class="badge badge-inactive">Inactive</span>';
-
                 return `<tr>
                     <td>${d.title}</td>
                     <td>${d.name || d.businessid}</td>
@@ -445,39 +227,27 @@
                     <td>${statusBadge}</td>
                 </tr>`;
             }).join('');
-
         } catch (e) {
-            console.warn('Recent deals failed:', e.message);
             tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Could not load deals. Is the server running?</td></tr>';
         }
     }
 
-    // ── Load recent businesses table ──────────────────────────────
     async function loadRecentBusinesses() {
         const tbody = document.getElementById('businesses-tbody');
         try {
-            const res = await fetch(`${API_URL}/businesses`);
-            const businesses = await res.json();
-
+            const businesses = await (await fetch(`${API_URL}/businesses`)).json();
             if (!businesses.length) {
-                tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No businesses found. Add your first storefront.</td></tr>';
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No businesses found.</td></tr>';
                 return;
             }
-
-            const recent = [...businesses]
-                .sort((a, b) => b.businessid - a.businessid)
-                .slice(0, 8);
-
-            tbody.innerHTML = recent.map(b => {
+            tbody.innerHTML = [...businesses].sort((a, b) => b.businessid - a.businessid).slice(0, 8).map(b => {
                 const tier = b.subscription_tier || 'Basic';
                 const tierBadge = tier === 'Premium'
                     ? '<span class="badge badge-premium">Premium</span>'
                     : '<span class="badge badge-basic">Basic</span>';
-
                 const verifiedBadge = b.is_verified
                     ? '<span class="badge badge-verified">Verified</span>'
                     : '<span class="badge badge-unverified">Unverified</span>';
-
                 return `<tr>
                     <td>${b.name}</td>
                     <td>${b.address || '—'}</td>
@@ -486,22 +256,16 @@
                     <td>${verifiedBadge}</td>
                 </tr>`;
             }).join('');
-
         } catch (e) {
-            console.warn('Recent businesses failed:', e.message);
             tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Could not load businesses. Is the server running?</td></tr>';
         }
     }
 
-    // ── Footer env note ───────────────────────────────────────────
-    document.getElementById('footer-note').textContent =
-        `Connected to: ${API_URL}`;
+    document.getElementById('footer-note').textContent = `Connected to: ${API_URL}`;
 
-    // ── Init ──────────────────────────────────────────────────────
     loadStats();
     loadRecentDeals();
     loadRecentBusinesses();
 </script>
-
 </body>
 </html>

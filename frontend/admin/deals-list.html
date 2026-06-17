@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - All Deals</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        .topnav { background: #fff; border-bottom: 2px solid #e9ecef; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+        .topnav .brand { font-size: 18px; font-weight: 700; color: #343a40; text-decoration: none; }
+        .topnav .brand span { color: #007BFF; }
+        .topnav .nav-links { display: flex; gap: 8px; }
+        .topnav .nav-links a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; color: #495057; transition: background 0.15s; }
+        .topnav .nav-links a:hover { background: #f1f3f5; }
+        .topnav .nav-links a.active { background: #e7f1ff; color: #007BFF; }
+        .page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .page-header h1 { margin: 0; font-size: 24px; color: #343a40; }
+        .add-btn { padding: 9px 18px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; transition: background 0.2s; }
+        .add-btn:hover { background: #218838; }
+
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .filter-bar input { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; width: 220px; }
+        .filter-bar select { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: #85d7a7; outline: 0; }
+        .results-count { margin-left: auto; font-size: 13px; color: #6c757d; }
+
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
+        thead th { background: #f8f9fa; text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #6c757d; border-bottom: 2px solid #e9ecef; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid #f1f3f5; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #f8f9fa; }
+        tbody td { padding: 10px 14px; vertical-align: middle; }
+
+        .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+        .badge-active   { background: #e9f7ec; color: #1e7e34; }
+        .badge-inactive { background: #f1f3f5; color: #6c757d; }
+
+        .actions { display: flex; gap: 6px; }
+        .btn { padding: 5px 11px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+        .btn:hover { opacity: 0.82; }
+        .btn-activate   { background: #e9f7ec; color: #1e7e34; }
+        .btn-deactivate { background: #fff3e8; color: #b25500; }
+        .btn-delete     { background: #fde8e8; color: #b02a2a; }
+
+        .empty-row td { text-align: center; color: #adb5bd; padding: 48px; font-size: 14px; }
+
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .toast.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <a class="brand" href="index.html">Destination <span>Deals</span> Admin</a>
+    <div class="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="businesses-list.html">Businesses</a>
+        <a href="deals-list.html" class="active">Deals</a>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="page-header">
+        <h1>All Deals</h1>
+        <a href="add-deal.html" class="add-btn">+ Add Deal</a>
+    </div>
+
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="Search by title or business...">
+        <select id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+        <select id="categoryFilter">
+            <option value="">All Categories</option>
+        </select>
+        <span class="results-count" id="resultsCount"></span>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Business</th>
+                    <th>Discount</th>
+                    <th>Schedule</th>
+                    <th>Views</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="deals-tbody">
+                <tr class="empty-row"><td colspan="8">Loading deals...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../config.js"></script>
+<script>
+    let allDeals = [];
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    function formatDiscount(d) {
+        if (!d.discountvalue || d.discountvalue == 0) return d.discounttype || '—';
+        if (d.discounttype === 'Percent') return `${d.discountvalue}% off`;
+        if (d.discounttype === 'Flat')    return `$${d.discountvalue} off`;
+        return d.discounttype;
+    }
+
+    function formatSchedule(d) {
+        if (!d.days) return '—';
+        const time = d.starttime && d.endtime
+            ? ` ${d.starttime.slice(0,5)}–${d.endtime.slice(0,5)}`
+            : '';
+        return d.days + time;
+    }
+
+    function renderTable(deals) {
+        const tbody = document.getElementById('deals-tbody');
+        document.getElementById('resultsCount').textContent =
+            `${deals.length} deal${deals.length !== 1 ? 's' : ''}`;
+
+        if (!deals.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No deals match your filters.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = deals.map(d => {
+            const statusBadge = d.isactive
+                ? '<span class="badge badge-active">Active</span>'
+                : '<span class="badge badge-inactive">Inactive</span>';
+
+            const toggleBtn = d.isactive
+                ? `<button class="btn btn-deactivate" onclick="toggleActive(${d.dealid}, false)">Deactivate</button>`
+                : `<button class="btn btn-activate"   onclick="toggleActive(${d.dealid}, true)">Activate</button>`;
+
+            return `<tr id="deal-row-${d.dealid}">
+                <td>${d.dealid}</td>
+                <td><strong>${d.title}</strong></td>
+                <td>${d.business_name || '—'}</td>
+                <td>${formatDiscount(d)}</td>
+                <td style="font-size:12px; color:#6c757d;">${formatSchedule(d)}</td>
+                <td>${(d.click_count || 0).toLocaleString()}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div class="actions">
+                        ${toggleBtn}
+                        <button class="btn btn-delete" onclick="deleteDeal(${d.dealid}, '${d.title.replace(/'/g, "\\'")}')">Delete</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function applyFilters() {
+        const search   = document.getElementById('searchInput').value.toLowerCase();
+        const status   = document.getElementById('statusFilter').value;
+        const category = document.getElementById('categoryFilter').value;
+
+        const filtered = allDeals.filter(d => {
+            const matchSearch = !search ||
+                d.title.toLowerCase().includes(search) ||
+                (d.business_name || '').toLowerCase().includes(search);
+            const matchStatus = !status ||
+                (status === 'active'   &&  d.isactive) ||
+                (status === 'inactive' && !d.isactive);
+            const matchCat = !category ||
+                (d.categories || '').includes(category);
+            return matchSearch && matchStatus && matchCat;
+        });
+
+        renderTable(filtered);
+    }
+
+    async function loadDeals() {
+        try {
+            const res = await fetch(`${API_URL}/deals`);
+            allDeals = await res.json();
+
+            // Populate category filter dynamically from live data
+            const catSet = new Set();
+            allDeals.forEach(d => {
+                if (d.categories) d.categories.split(', ').forEach(c => catSet.add(c.trim()));
+            });
+            const catSelect = document.getElementById('categoryFilter');
+            [...catSet].sort().forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                catSelect.appendChild(opt);
+            });
+
+            // Check for ?filter=inactive from dashboard quick action
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('filter') === 'inactive') {
+                document.getElementById('statusFilter').value = 'inactive';
+            }
+
+            applyFilters();
+        } catch (e) {
+            document.getElementById('deals-tbody').innerHTML =
+                '<tr class="empty-row"><td colspan="8">Could not load deals. Is the server running?</td></tr>';
+        }
+    }
+
+    async function toggleActive(id, newState) {
+        try {
+            const res = await fetch(`${API_URL}/deals/${id}/active`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isactive: newState })
+            });
+            if (!res.ok) throw new Error('Request failed');
+            const deal = allDeals.find(d => d.dealid === id);
+            if (deal) deal.isactive = newState;
+            applyFilters();
+            showToast(`Deal ${newState ? 'activated' : 'deactivated'} successfully.`);
+        } catch (e) {
+            showToast('Error updating deal status.', 'error');
+        }
+    }
+
+    async function deleteDeal(id, title) {
+        if (!confirm(`Permanently delete "${title}"?\n\nThis will also remove all schedule and category links. This cannot be undone.`)) return;
+        try {
+            const res = await fetch(`${API_URL}/deals/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Request failed');
+            allDeals = allDeals.filter(d => d.dealid !== id);
+            applyFilters();
+            showToast(`"${title}" deleted successfully.`);
+        } catch (e) {
+            showToast('Error deleting deal.', 'error');
+        }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('statusFilter').addEventListener('change', applyFilters);
+    document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+
+    loadDeals();
+</script>
+</body>
+</html>

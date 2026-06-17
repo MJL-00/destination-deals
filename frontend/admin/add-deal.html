@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Manage Deals</title>
+    <title>Admin - Add Deal</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f8f9fa; color: #333; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -41,12 +41,10 @@
                 <label>Description</label>
                 <textarea id="description" rows="3" maxlength="255" placeholder="Details regarding constraints..."></textarea>
             </div>
-
             <div class="form-group">
                 <label>Assign Categories</label>
                 <div id="categoryCheckboxes" class="checkbox-group">Loading categories...</div>
             </div>
-
             <div class="form-group">
                 <label>Active Days (Schedule) *</label>
                 <div class="checkbox-group" id="dayCheckboxes">
@@ -59,7 +57,6 @@
                     <div class="checkbox-item"><input type="checkbox" name="days" value="Sunday"    id="day_sun"><label for="day_sun"> Sunday</label></div>
                 </div>
             </div>
-
             <div class="time-row">
                 <div class="form-group">
                     <label>Start Time *</label>
@@ -70,7 +67,6 @@
                     <input type="time" id="endtime" step="1800" value="21:00" required>
                 </div>
             </div>
-
             <div class="form-group">
                 <label>Discount Type *</label>
                 <select id="discounttype" required>
@@ -85,14 +81,14 @@
                 <label>Discount Value (Optional)</label>
                 <input type="number" id="discountvalue" step="0.01" placeholder="e.g., 15.00">
             </div>
-
             <button type="submit">Save Deal</button>
         </form>
 
         <div id="msgBox" class="message"></div>
         <div class="nav-links">
             <a href="index.html">← Dashboard</a>
-            <a href="businesses.html">← Business Management</a>
+            <a href="add-business.html">← Add a Business</a>
+            <a href="deals-list.html">→ View All Deals</a>
         </div>
     </div>
 
