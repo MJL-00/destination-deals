@@ -98,6 +98,8 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Address</th>
+                    <th>City</th>
+                    <th>State</th>
                     <th>Phone</th>
                     <th>Tier</th>
                     <th>Verified</th>
@@ -107,7 +109,7 @@
                 </tr>
             </thead>
             <tbody id="businesses-tbody">
-                <tr class="empty-row"><td colspan="9">Loading businesses...</td></tr>
+                <tr class="empty-row"><td colspan="11">Loading businesses...</td></tr>
             </tbody>
         </table>
     </div>
@@ -135,7 +137,7 @@
             `${businesses.length} business${businesses.length !== 1 ? 'es' : ''}`;
 
         if (!businesses.length) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No businesses match your filters.</td></tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="11">No businesses match your filters.</td></tr>';
             return;
         }
 
@@ -160,6 +162,8 @@
                 <td>${b.businessid}</td>
                 <td><strong>${b.name}</strong></td>
                 <td>${b.address || '—'}</td>
+                <td>${b.city || '—'}</td>
+                <td>${b.state || '—'}</td>
                 <td>${b.phone || '—'}</td>
                 <td>${tierBadge}</td>
                 <td>${verifiedBadge}</td>
@@ -211,7 +215,7 @@
             applyFilters();
         } catch (e) {
             document.getElementById('businesses-tbody').innerHTML =
-                '<tr class="empty-row"><td colspan="9">Could not load businesses. Is the server running?</td></tr>';
+                '<tr class="empty-row"><td colspan="11">Could not load businesses. Is the server running?</td></tr>';
         }
     }
 

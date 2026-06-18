@@ -1,73 +1,55 @@
 <!DOCTYPE html>
-<html>
-
-<!----GITHUB BACKUP TEST----->
-<!----GITHUB BACKUP TEST----->
-<!----GITHUB BACKUP TEST----->
-<!----GITHUB BACKUP TEST----->
-
+<html lang="en">
 <head>
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
     <title>Destination Deals</title>
-
-    <link rel="stylesheet"
-          href="styles.css">
-
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-    <div class="container">
+<div class="container">
 
+    <!-- Hero -->
     <div class="hero">
-
-        <h1 class="logo-text">
-            Destination Deals
-        </h1>
-
+        <img
+            src="images/default_logo.png"
+            alt="Destination Deals"
+            class="hero-logo-img">
         <p class="tagline">
-            Discover local savings,
-            activities,
-            shopping,
-            and dining.
+            Discover local savings on activities, shopping, and dining.
         </p>
-
     </div>
 
-    <div class="filters">
+    <!-- Location permission banner -->
+    <div class="location-banner" id="locationBanner">
+        <span class="location-banner-icon">📍</span>
+        <div class="location-banner-text">
+            <strong>See deals closest to you</strong>
+            <span>Allow location access to automatically sort deals by distance from where you are.</span>
+        </div>
+        <button class="location-allow-btn" id="allowLocationBtn">Allow</button>
+        <button class="location-dismiss-btn" id="dismissLocationBtn">Not now</button>
+    </div>
 
-        <div>
+    <!-- Filters -->
+    <div class="filters">
+        <div class="filter-group">
             <label>Location</label>
             <select id="locationSelect">
                 <option value="">Select a Location</option>
             </select>
         </div>
-
-        <div>
+        <div class="filter-group">
             <label>Category</label>
-
             <select id="categorySelect">
-
-                <option value="">
-                     Any Category
-                </option>
-
+                <option value="">Any Category</option>
             </select>
         </div>
-
-        <div>
+        <div class="filter-group">
             <label>Day</label>
-
             <select id="daySelect">
-
-                <option value="">
-                    Any Day
-                </option>
-
+                <option value="">Any Day</option>
                 <option>Sunday</option>
                 <option>Monday</option>
                 <option>Tuesday</option>
@@ -75,38 +57,48 @@
                 <option>Thursday</option>
                 <option>Friday</option>
                 <option>Saturday</option>
-
             </select>
-
         </div>
-
-        <button id="searchBtn" disabled>
-            Search
-        </button>
-
+        <div class="filter-group search-group">
+            <label>Search</label>
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Business or deal name..."
+                autocomplete="off">
+            <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+        </div>
+        <div class="filter-group sort-group">
+            <label>Sort by</label>
+            <select id="sortSelect">
+                <option value="default">Default</option>
+                <option value="nearest">Nearest First</option>
+                <option value="az">A → Z</option>
+            </select>
+        </div>
     </div>
 
-    <hr>
+    <!-- Result count + filter tags -->
+    <div id="resultsHeader" style="display:none;">
+        <div class="results-meta">
+            <span id="dealCount"></span>
+            <div class="filter-tags" id="filterTags"></div>
+        </div>
+    </div>
 
+    <!-- Deal cards -->
     <div id="results">
-
         <div class="welcome-card">
-
-            <p>
-                Select a location and click Search to view local deals.
+            <p>Select a location above to see local deals near you.</p>
+            <p style="margin-top: 10px; font-size: 13px; color: #adb5bd;">
+                Visiting a new area? Scan a local QR code to load deals instantly.
             </p>
-
         </div>
-
     </div>
 
+</div>
 
-    <script src="config.js"></script>
-    <script src="app.js"></script>
-
-    </div>
-
-
+<script src="config.js"></script>
+<script src="app.js"></script>
 </body>
-
 </html>
