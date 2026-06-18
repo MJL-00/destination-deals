@@ -133,7 +133,7 @@ function showWelcomeState() {
     resultsHeader.style.display = 'none';
     results.innerHTML = `
         <div class="welcome-card">
-            <p>👋 Select a location above to see local deals near you.</p>
+            <p>Select a location above to see local deals near you.</p>
             <p style="margin-top: 10px; font-size: 13px; color: #adb5bd;">
                 Visiting a new area? Scan a local QR code to load deals instantly.
             </p>
@@ -317,6 +317,14 @@ function formatDiscount(deal) {
     return deal.discounttype;
 }
 
+function formatEndDate(enddate) {
+    if (!enddate) return '';
+    const d = new Date(enddate);
+    // Add one day offset correction for UTC date parsing
+    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 function formatDays(dayString) {
     if (!dayString) return '—';
     const order = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -354,14 +362,17 @@ function displayDeals(deals) {
         const distText = formatDistance(biz.distance);
         const dealWord = biz.deals.length === 1 ? '1 deal' : `${biz.deals.length} deals`;
 
-        const previewLines = biz.deals.map(d =>
-            `<div class="deal-preview-row">
-                <span class="deal-preview-title">${d.title}</span>
+        const previewLines = biz.deals.map(d => {
+            const endLabel = d.enddate
+                ? `<span class="enddate-badge">Ends ${formatEndDate(d.enddate)}</span>`
+                : '';
+            return `<div class="deal-preview-row">
+                <span class="deal-preview-title">${d.title} ${endLabel}</span>
                 ${d.description
                     ? `<span class="deal-preview-desc">${d.description}</span>`
                     : ''}
-            </div>`
-        ).join('');
+            </div>`;
+        }).join('');
 
         const dealRows = biz.deals.map(d => {
             const discount = formatDiscount(d);
@@ -375,6 +386,7 @@ function displayDeals(deals) {
                     <span><strong>Days:</strong> ${formatDays(d.dayofweek)}</span>
                     <span><strong>Time:</strong> ${formatTime(d.starttime)} – ${formatTime(d.endtime)}</span>
                     ${d.categories ? `<span><strong>Category:</strong> ${d.categories}</span>` : ''}
+                    ${d.enddate ? `<span class="enddate-meta">Offer ends ${formatEndDate(d.enddate)}</span>` : ''}
                 </div>
             </div>`;
         }).join('');

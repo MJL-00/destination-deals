@@ -22,6 +22,58 @@
         .nav-links { margin-top: 20px; text-align: center; display: flex; justify-content: center; gap: 20px; }
         .nav-links a { color: #6c757d; text-decoration: none; font-size: 14px; }
         .nav-links a:hover { text-decoration: underline; }
+
+        /* Limited time offer section */
+        .lto-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .lto-toggle input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            accent-color: #28a745;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .lto-toggle label {
+            margin: 0;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+        }
+        .lto-toggle .lto-hint {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+        .lto-dates {
+            display: none;
+            background: #f0faf2;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .lto-dates.active { display: block; }
+        .lto-dates .time-row { margin-bottom: 0; }
+        .lto-dates input[type="date"] {
+            border-color: #c3e6cb;
+        }
+        .lto-dates input[type="date"]:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40,167,69,.25);
+        }
+        .lto-dates label { color: #155724; }
     </style>
 </head>
 <body>
@@ -47,6 +99,12 @@
             </div>
             <div class="form-group">
                 <label>Active Days (Schedule) *</label>
+                <div style="margin-bottom: 8px;">
+                    <label style="display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:13px; color:#495057; cursor:pointer;">
+                        <input type="checkbox" id="selectAllDays" style="width:auto; margin:0;">
+                        Select All / Deselect All
+                    </label>
+                </div>
                 <div class="checkbox-group" id="dayCheckboxes">
                     <div class="checkbox-item"><input type="checkbox" name="days" value="Monday"    id="day_mon"><label for="day_mon"> Monday</label></div>
                     <div class="checkbox-item"><input type="checkbox" name="days" value="Tuesday"   id="day_tue"><label for="day_tue"> Tuesday</label></div>
@@ -81,6 +139,30 @@
                 <label>Discount Value (Optional)</label>
                 <input type="number" id="discountvalue" step="0.01" placeholder="e.g., 15.00">
             </div>
+
+            <!-- Limited Time Offer toggle -->
+            <div class="lto-toggle" onclick="toggleLTO()">
+                <input type="checkbox" id="isLimitedTime">
+                <label for="isLimitedTime">
+                    Limited Time Offer
+                    <span class="lto-hint">— set a go live date, expiry date, or both</span>
+                </label>
+            </div>
+
+            <!-- Date range — hidden until checkbox is ticked -->
+            <div class="lto-dates" id="ltoDates">
+                <div class="time-row">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Go Live Date</label>
+                        <input type="date" id="startdate" disabled>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Expiry Date</label>
+                        <input type="date" id="enddate" disabled>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit">Save Deal</button>
         </form>
 
@@ -96,6 +178,49 @@
     <script>
         let businessMap = {};
 
+        // ── Limited Time Offer toggle ─────────────────────────────
+        function toggleLTO() {
+            const checkbox  = document.getElementById('isLimitedTime');
+            const dateBlock = document.getElementById('ltoDates');
+            const startdate = document.getElementById('startdate');
+            const enddate   = document.getElementById('enddate');
+
+            // Flip checkbox state (since the div onclick fires before the checkbox)
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                dateBlock.classList.add('active');
+                startdate.disabled = false;
+                enddate.disabled   = false;
+            } else {
+                dateBlock.classList.remove('active');
+                startdate.disabled = true;
+                enddate.disabled   = true;
+                startdate.value    = '';
+                enddate.value      = '';
+            }
+        }
+
+        // Prevent the div onclick from double-firing when clicking the checkbox directly
+        document.getElementById('isLimitedTime').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dateBlock = document.getElementById('ltoDates');
+            const startdate = document.getElementById('startdate');
+            const enddate   = document.getElementById('enddate');
+            if (this.checked) {
+                dateBlock.classList.add('active');
+                startdate.disabled = false;
+                enddate.disabled   = false;
+            } else {
+                dateBlock.classList.remove('active');
+                startdate.disabled = true;
+                enddate.disabled   = true;
+                startdate.value    = '';
+                enddate.value      = '';
+            }
+        });
+
+        // ── Load form assets ──────────────────────────────────────
         async function initPageData() {
             try {
                 const bizRes = await fetch(`${API_URL}/businesses/lookup`);
@@ -126,12 +251,13 @@
             }
         }
 
+        // ── Submit ────────────────────────────────────────────────
         document.getElementById('dealForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const msgBox = document.getElementById('msgBox');
             msgBox.style.display = 'none';
 
-            const typedName = document.getElementById('businessSearch').value;
+            const typedName  = document.getElementById('businessSearch').value;
             const verifiedId = businessMap[typedName];
 
             if (!verifiedId) {
@@ -141,10 +267,10 @@
             }
 
             const checkedBoxes = document.querySelectorAll('input[name="categories"]:checked');
-            const categoryIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+            const categoryIds  = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
 
             const checkedDays = document.querySelectorAll('input[name="days"]:checked');
-            const activeDays = Array.from(checkedDays).map(cb => cb.value);
+            const activeDays  = Array.from(checkedDays).map(cb => cb.value);
 
             if (activeDays.length === 0) {
                 msgBox.style.cssText = 'display:block; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;';
@@ -152,19 +278,39 @@
                 return;
             }
 
+            const isLimited = document.getElementById('isLimitedTime').checked;
+            const startdate = document.getElementById('startdate').value || null;
+            const enddate   = document.getElementById('enddate').value   || null;
+
+            // Validate dates if limited time is checked
+            if (isLimited) {
+                if (!startdate || !enddate) {
+                    msgBox.style.cssText = 'display:block; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;';
+                    msgBox.innerText = "Error: Please enter both a start and end date for the limited time offer.";
+                    return;
+                }
+                if (new Date(enddate) <= new Date(startdate)) {
+                    msgBox.style.cssText = 'display:block; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;';
+                    msgBox.innerText = "Error: End date must be after start date.";
+                    return;
+                }
+            }
+
             const payload = {
-                businessid: verifiedId,
-                title: document.getElementById('title').value,
-                description: document.getElementById('description').value || null,
-                discounttype: document.getElementById('discounttype').value,
+                businessid:    verifiedId,
+                title:         document.getElementById('title').value,
+                description:   document.getElementById('description').value || null,
+                discounttype:  document.getElementById('discounttype').value,
                 discountvalue: document.getElementById('discountvalue').value
                     ? parseFloat(document.getElementById('discountvalue').value)
                     : null,
-                isactive: true,
-                categoryIds: categoryIds,
-                activeDays: activeDays,
-                starttime: document.getElementById('starttime').value || null,
-                endtime: document.getElementById('endtime').value || null
+                isactive:      true,
+                categoryIds:   categoryIds,
+                activeDays:    activeDays,
+                starttime:     document.getElementById('starttime').value || null,
+                endtime:       document.getElementById('endtime').value   || null,
+                startdate:     isLimited ? startdate : null,
+                enddate:       isLimited ? enddate   : null
             };
 
             try {
@@ -178,6 +324,10 @@
                     msgBox.style.cssText = 'display:block; background:#d4edda; color:#155724; border:1px solid #c3e6cb;';
                     msgBox.innerText = data.message;
                     document.getElementById('dealForm').reset();
+                    // Reset LTO section manually since reset() won't re-disable the dates
+                    document.getElementById('ltoDates').classList.remove('active');
+                    document.getElementById('startdate').disabled = true;
+                    document.getElementById('enddate').disabled   = true;
                 } else {
                     throw new Error(data.error);
                 }
@@ -188,6 +338,19 @@
         });
 
         initPageData();
+
+        // ── Select All / Deselect All days ────────────────────────
+        document.getElementById('selectAllDays').addEventListener('change', function() {
+            document.querySelectorAll('input[name="days"]').forEach(cb => cb.checked = this.checked);
+        });
+
+        document.getElementById('dayCheckboxes').addEventListener('change', function(e) {
+            if (e.target.name === 'days') {
+                const dayBoxes  = document.querySelectorAll('input[name="days"]');
+                const allChecked = [...dayBoxes].every(cb => cb.checked);
+                document.getElementById('selectAllDays').checked = allChecked;
+            }
+        });
     </script>
 </body>
 </html>

@@ -92,6 +92,8 @@ const getDealsByLocation = async (req, res) => {
                 Deal.Description,
                 Deal.DiscountType,
                 Deal.DiscountValue,
+                Deal.startdate,
+                Deal.enddate,
                 Location.City,
                 Location.State AS state,
                 STRING_AGG(DISTINCT Category.CategoryName, ', ') AS categories,
@@ -110,10 +112,13 @@ const getDealsByLocation = async (req, res) => {
             LEFT JOIN DealCategory ON Deal.DealID             = DealCategory.DealID
             LEFT JOIN Category     ON DealCategory.CategoryID  = Category.CategoryID
             WHERE Location.City = $1
+              AND (Deal.startdate IS NULL OR Deal.startdate <= CURRENT_DATE)
+              AND (Deal.enddate IS NULL OR Deal.enddate >= CURRENT_DATE)
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
+                Deal.startdate, Deal.enddate,
                 Location.City, Location.State
             ORDER BY Business.Name
         `, [city]);
@@ -142,6 +147,8 @@ const getDealsByLocationAndCategory = async (req, res) => {
                 Deal.Description,
                 Deal.DiscountType,
                 Deal.DiscountValue,
+                Deal.startdate,
+                Deal.enddate,
                 Location.City,
                 Location.State AS state,
                 STRING_AGG(DISTINCT Category.CategoryName, ', ') AS categories,
@@ -161,10 +168,13 @@ const getDealsByLocationAndCategory = async (req, res) => {
             JOIN Category         ON DealCategory.CategoryID   = Category.CategoryID
             WHERE Location.City        = $1
               AND Category.CategoryName = $2
+              AND (Deal.startdate IS NULL OR Deal.startdate <= CURRENT_DATE)
+              AND (Deal.enddate IS NULL OR Deal.enddate >= CURRENT_DATE)
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
+                Deal.startdate, Deal.enddate,
                 Location.City, Location.State
             ORDER BY Business.Name
         `, [city, category]);
@@ -208,6 +218,8 @@ const getDealsByLocationAndDay = async (req, res) => {
             LEFT JOIN Category     ON DealCategory.CategoryID  = Category.CategoryID
             WHERE Location.City        = $1
               AND DealSchedule.DayOfWeek = $2
+              AND (Deal.startdate IS NULL OR Deal.startdate <= CURRENT_DATE)
+              AND (Deal.enddate IS NULL OR Deal.enddate >= CURRENT_DATE)
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
@@ -258,10 +270,13 @@ const getDealsByLocationCategoryAndDay = async (req, res) => {
             WHERE Location.City        = $1
               AND Category.CategoryName = $2
               AND DealSchedule.DayOfWeek = $3
+              AND (Deal.startdate IS NULL OR Deal.startdate <= CURRENT_DATE)
+              AND (Deal.enddate IS NULL OR Deal.enddate >= CURRENT_DATE)
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
+                Deal.startdate, Deal.enddate,
                 Location.City, Location.State,
                 DealSchedule.DayOfWeek, DealSchedule.StartTime, DealSchedule.EndTime
             ORDER BY Business.Name
@@ -278,7 +293,7 @@ const createDeal = async (req, res) => {
     const {
         businessid, title, description, discounttype,
         discountvalue, isactive, categoryIds, activeDays,
-        starttime, endtime
+        starttime, endtime, startdate, enddate
     } = req.body;
 
     if (!businessid || !title || !discounttype || !activeDays || activeDays.length === 0) {
@@ -290,10 +305,11 @@ const createDeal = async (req, res) => {
         await client.query('BEGIN');
 
         const dealResult = await client.query(`
-            INSERT INTO deal (businessid, title, description, discounttype, discountvalue, isactive)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO deal (businessid, title, description, discounttype, discountvalue, isactive, startdate, enddate)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING dealid;
-        `, [businessid, title, description, discounttype, discountvalue, isactive ?? true]);
+        `, [businessid, title, description, discounttype, discountvalue, isactive ?? true,
+            startdate || null, enddate || null]);
 
         const newDealId = dealResult.rows[0].dealid;
 

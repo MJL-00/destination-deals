@@ -258,13 +258,27 @@
 
     // ── Delete business ───────────────────────────────────────────
     async function deleteBusiness(id, name) {
-        if (!confirm(`Permanently delete "${name}"?\n\nThis will also remove all associated location and category links. This cannot be undone.`)) return;
+        // First fetch deal count for this business so the warning is accurate
+        let dealCount = 0;
+        try {
+            const dealsRes = await fetch(`${API_URL}/deals`);
+            const deals = await dealsRes.json();
+            dealCount = deals.filter(d => d.businessid === id).length;
+        } catch (e) { /* non-blocking — proceed with generic warning if fetch fails */ }
+
+        const dealWarning = dealCount > 0
+            ? `\n\nThis will also permanently delete ${dealCount} associated deal${dealCount !== 1 ? 's' : ''} and all their schedules.`
+            : '';
+
+        if (!confirm(`Permanently delete "${name}"?${dealWarning}\n\nThis cannot be undone.`)) return;
+
         try {
             const res = await fetch(`${API_URL}/businesses/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Request failed');
+            const data = await res.json();
             allBusinesses = allBusinesses.filter(b => b.businessid !== id);
             applyFilters();
-            showToast(`"${name}" deleted successfully.`);
+            showToast(data.message || `"${name}" deleted successfully.`);
         } catch (e) {
             showToast('Error deleting business.', 'error');
         }

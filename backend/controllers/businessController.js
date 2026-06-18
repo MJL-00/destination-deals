@@ -56,7 +56,7 @@ const getBusinessById = async (req, res) => {
 
 // ── CREATE NEW BUSINESS ───────────────────────────────────────
 const createBusiness = async (req, res) => {
-    const { name, address, locationid, phone, website, subscription_tier, categoryIds } = req.body;
+    const { name, address, locationid, phone, website, subscription_tier, latitude, longitude, categoryIds } = req.body;
 
     let formattedWebsite = website ? website.trim() : null;
     if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
@@ -72,10 +72,11 @@ const createBusiness = async (req, res) => {
         await client.query('BEGIN');
 
         const businessResult = await client.query(`
-            INSERT INTO business (name, address, phone, website, subscription_tier)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO business (name, address, phone, website, subscription_tier, latitude, longitude)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING businessid;
-        `, [name, address, phone || null, formattedWebsite, subscription_tier || 'Basic']);
+        `, [name, address, phone || null, formattedWebsite, subscription_tier || 'Basic',
+            latitude || null, longitude || null]);
 
         const newBusinessId = businessResult.rows[0].businessid;
 
@@ -216,15 +217,35 @@ const incrementDirectionsClick = async (req, res) => {
     }
 };
 
-// ── DELETE BUSINESS ───────────────────────────────────────────
+// ── DELETE BUSINESS (cascades to deals, schedules, categories) ─
 const deleteBusiness = async (req, res) => {
-    const { id } = req.params;
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid business ID.' });
+
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
+
+        // Find all deals belonging to this business
+        const dealResult = await client.query(
+            'SELECT dealid FROM deal WHERE businessid = $1', [id]
+        );
+        const dealIds = dealResult.rows.map(r => r.dealid);
+
+        // For each deal, remove its junction table entries first
+        for (const dealId of dealIds) {
+            await client.query('DELETE FROM dealcategory WHERE dealid = $1', [dealId]);
+            await client.query('DELETE FROM dealschedule WHERE dealid = $1', [dealId]);
+        }
+
+        // Delete all deals for this business
+        await client.query('DELETE FROM deal WHERE businessid = $1', [id]);
+
+        // Remove business junction table entries
         await client.query('DELETE FROM businesscategory WHERE businessid = $1', [id]);
         await client.query('DELETE FROM businesslocation WHERE businessid = $1', [id]);
 
+        // Finally delete the business itself
         const result = await client.query(
             'DELETE FROM business WHERE businessid = $1 RETURNING businessid, name',
             [id]
@@ -235,7 +256,10 @@ const deleteBusiness = async (req, res) => {
         }
 
         await client.query('COMMIT');
-        res.json({ message: `Business "${result.rows[0].name}" deleted successfully.` });
+        res.json({
+            message: `Business "${result.rows[0].name}" and ${dealIds.length} associated deal${dealIds.length !== 1 ? 's' : ''} deleted successfully.`,
+            deals_deleted: dealIds.length
+        });
     } catch (err) {
         await client.query('ROLLBACK');
         console.error("Transaction Error inside deleteBusiness:", err);

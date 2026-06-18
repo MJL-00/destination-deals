@@ -21,10 +21,12 @@ CREATE TABLE Business (
     Address                 VARCHAR(255),
     Phone                   VARCHAR(20),
     Website                 VARCHAR(255),
-    subscription_tier       VARCHAR(20) NOT NULL DEFAULT 'Basic',
-    is_verified             BOOLEAN NOT NULL DEFAULT FALSE,
-    directions_click_count  INTEGER NOT NULL DEFAULT 0,
-    website_click_count     INTEGER NOT NULL DEFAULT 0,
+    subscription_tier       VARCHAR(20)  NOT NULL DEFAULT 'Basic',
+    is_verified             BOOLEAN      NOT NULL DEFAULT FALSE,
+    directions_click_count  INTEGER      NOT NULL DEFAULT 0,
+    website_click_count     INTEGER      NOT NULL DEFAULT 0,
+    latitude                DECIMAL(9,6),
+    longitude               DECIMAL(9,6),
     CONSTRAINT chk_subscription_tier CHECK (subscription_tier IN ('Basic', 'Premium'))
 );
 
@@ -36,13 +38,14 @@ CREATE TABLE Deal (
     DiscountType    VARCHAR(50),
     DiscountValue   DECIMAL(10,2),
     IsActive        BOOLEAN DEFAULT TRUE,
+    startdate       DATE,
+    enddate         DATE,
     click_count     INTEGER NOT NULL DEFAULT 0,
     redemption_count INTEGER NOT NULL DEFAULT 0,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     FOREIGN KEY (BusinessID) REFERENCES Business(BusinessID)
 );
-
 CREATE TABLE DealSchedule (
     ScheduleID SERIAL PRIMARY KEY,
     DealID INT NOT NULL,
