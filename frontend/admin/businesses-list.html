@@ -225,6 +225,32 @@
                                 <input type="number" step="0.000001" id="edit-lng-${b.businessid}" value="${b.longitude || ''}">
                             </div>
                         </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+                            <label style="display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; cursor:pointer;">
+                                <input type="checkbox" id="edit-outdoor-${b.businessid}"
+                                    ${b.outdoor_dining ? 'checked' : ''}
+                                    style="width:auto; margin:0; accent-color:#007BFF;">
+                                Outdoor Dining
+                            </label>
+                            <label style="display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; cursor:pointer;">
+                                <input type="checkbox" id="edit-music-${b.businessid}"
+                                    ${b.live_music ? 'checked' : ''}
+                                    style="width:auto; margin:0; accent-color:#007BFF;">
+                                Live Music <span style="font-weight:400; color:#6c757d;">(frequent)</span>
+                            </label>
+                            <label style="display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; cursor:pointer;">
+                                <input type="checkbox" id="edit-waterfront-${b.businessid}"
+                                    ${b.waterfront ? 'checked' : ''}
+                                    style="width:auto; margin:0; accent-color:#007BFF;">
+                                Waterfront
+                            </label>
+                            <label style="display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; cursor:pointer;">
+                                <input type="checkbox" id="edit-petfriendly-${b.businessid}"
+                                    ${b.pet_friendly ? 'checked' : ''}
+                                    style="width:auto; margin:0; accent-color:#007BFF;">
+                                Pet Friendly
+                            </label>
+                        </div>
                         <div class="edit-actions">
                             <button class="btn btn-save" onclick="saveBusiness(${b.businessid})">Save Changes</button>
                             <button class="btn btn-cancel" onclick="toggleEditPanel(${b.businessid})">Cancel</button>
@@ -256,6 +282,10 @@
             is_verified:       document.getElementById(`edit-verified-${id}`).value === 'true',
             latitude:          document.getElementById(`edit-lat-${id}`).value  ? parseFloat(document.getElementById(`edit-lat-${id}`).value)  : null,
             longitude:         document.getElementById(`edit-lng-${id}`).value ? parseFloat(document.getElementById(`edit-lng-${id}`).value) : null,
+            outdoor_dining:    document.getElementById(`edit-outdoor-${id}`).checked,
+            live_music:        document.getElementById(`edit-music-${id}`).checked,
+            waterfront:        document.getElementById(`edit-waterfront-${id}`).checked,
+            pet_friendly:      document.getElementById(`edit-petfriendly-${id}`).checked,
         };
 
         try {

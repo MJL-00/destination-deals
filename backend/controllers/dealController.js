@@ -13,6 +13,10 @@ const getDealsByDay = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.outdoor_dining,
+                Business.live_music,
+                Business.waterfront,
+                Business.pet_friendly,
                 Deal.Title,
                 Deal.Description,
                 Deal.DiscountType,
@@ -30,6 +34,8 @@ const getDealsByDay = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.outdoor_dining, Business.live_music,
+                Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 DealSchedule.DayOfWeek, DealSchedule.StartTime, DealSchedule.EndTime
         `, [day]);
@@ -53,6 +59,10 @@ const getDealsByCategory = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.outdoor_dining,
+                Business.live_music,
+                Business.waterfront,
+                Business.pet_friendly,
                 Deal.Title,
                 Deal.Description,
                 Deal.DiscountType,
@@ -66,6 +76,8 @@ const getDealsByCategory = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.outdoor_dining, Business.live_music,
+                Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue
         `, [category]);
         res.json(result.rows);
@@ -88,6 +100,10 @@ const getDealsByLocation = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.outdoor_dining,
+                Business.live_music,
+                Business.waterfront,
+                Business.pet_friendly,
                 Deal.Title,
                 Deal.Description,
                 Deal.DiscountType,
@@ -117,6 +133,8 @@ const getDealsByLocation = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.outdoor_dining, Business.live_music,
+                Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 Deal.startdate, Deal.enddate,
                 Location.City, Location.State
@@ -143,6 +161,10 @@ const getDealsByLocationAndCategory = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.outdoor_dining,
+                Business.live_music,
+                Business.waterfront,
+                Business.pet_friendly,
                 Deal.Title,
                 Deal.Description,
                 Deal.DiscountType,
@@ -173,6 +195,8 @@ const getDealsByLocationAndCategory = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.outdoor_dining, Business.live_music,
+                Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 Deal.startdate, Deal.enddate,
                 Location.City, Location.State
@@ -199,6 +223,10 @@ const getDealsByLocationAndDay = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.outdoor_dining,
+                Business.live_music,
+                Business.waterfront,
+                Business.pet_friendly,
                 Deal.Title,
                 Deal.Description,
                 Deal.DiscountType,
@@ -223,6 +251,8 @@ const getDealsByLocationAndDay = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.outdoor_dining, Business.live_music,
+                Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 DealSchedule.DayOfWeek, DealSchedule.StartTime, DealSchedule.EndTime,
                 Location.City, Location.State
@@ -250,6 +280,10 @@ const getDealsByLocationCategoryAndDay = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.outdoor_dining,
+                Business.live_music,
+                Business.waterfront,
+                Business.pet_friendly,
                 Deal.Title,
                 Deal.Description,
                 Deal.DiscountType,
@@ -275,6 +309,8 @@ const getDealsByLocationCategoryAndDay = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.outdoor_dining, Business.live_music,
+                Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 Deal.startdate, Deal.enddate,
                 Location.City, Location.State,

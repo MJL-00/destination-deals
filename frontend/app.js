@@ -257,17 +257,21 @@ function groupByBusiness(deals) {
         const key = deal.name;
         if (!map.has(key)) {
             map.set(key, {
-                name:       deal.name,
-                businessid: deal.businessid,
-                address:    deal.address,
-                city:       deal.city,
-                state:      deal.state,
-                phone:      deal.phone,
-                website:    deal.website,
-                latitude:   deal.latitude,
-                longitude:  deal.longitude,
-                distance:   deal.distance,
-                deals:      []
+                name:           deal.name,
+                businessid:     deal.businessid,
+                address:        deal.address,
+                city:           deal.city,
+                state:          deal.state,
+                phone:          deal.phone,
+                website:        deal.website,
+                latitude:       deal.latitude,
+                longitude:      deal.longitude,
+                distance:       deal.distance,
+                outdoor_dining: deal.outdoor_dining || false,
+                live_music:     deal.live_music     || false,
+                waterfront:     deal.waterfront     || false,
+                pet_friendly:   deal.pet_friendly   || false,
+                deals:          []
             });
         }
         map.get(key).deals.push(deal);
@@ -389,7 +393,6 @@ function displayDeals(deals) {
                 <div class="deal-row-meta">
                     <span><strong>Days:</strong> ${formatDays(d.dayofweek)}</span>
                     <span><strong>Time:</strong> ${formatTime(d.starttime)} – ${formatTime(d.endtime)}</span>
-                    ${d.categories ? `<span><strong>Category:</strong> ${d.categories}</span>` : ''}
                     ${d.enddate ? `<span class="enddate-meta">Offer ends ${formatEndDate(d.enddate)}</span>` : ''}
                 </div>
             </div>`;
@@ -410,6 +413,13 @@ function displayDeals(deals) {
                     <button class="expand-btn" id="icon-${cardId}" aria-label="Expand">▾</button>
                 </div>
             </div>
+            ${(biz.outdoor_dining || biz.live_music || biz.waterfront || biz.pet_friendly) ? `
+            <div class="amenity-icons">
+                ${biz.outdoor_dining ? `<span class="amenity-icon" data-tooltip="Outdoor Dining Available" onclick="showAmenityLegend(event, 'Outdoor Dining Available')">🌿</span>` : ''}
+                ${biz.live_music     ? `<span class="amenity-icon" data-tooltip="Frequently Hosts Live Music" onclick="showAmenityLegend(event, 'Frequently Hosts Live Music')">🎵</span>` : ''}
+                ${biz.waterfront     ? `<span class="amenity-icon" data-tooltip="Waterfront" onclick="showAmenityLegend(event, 'Waterfront')">⚓</span>` : ''}
+                ${biz.pet_friendly   ? `<span class="amenity-icon" data-tooltip="Pet-Friendly" onclick="showAmenityLegend(event, 'Pet-Friendly')">🐾</span>` : ''}
+            </div>` : ''}
             <div class="card-detail" id="detail-${cardId}">
                 <p class="address"><strong>Address:</strong> ${fullAddr}</p>
                 <div class="deal-rows-list">${dealRows}</div>
@@ -443,6 +453,40 @@ function trackDirectionsClick(e, businessId) {
     if (!businessId) return;
     fetch(`${API_URL}/businesses/${businessId}/directions-click`, { method: 'POST' })
         .catch(() => {});
+}
+
+// ── Amenity legend popup (mobile tap) ────────────────────────
+let amenityLegendTimer = null;
+
+function showAmenityLegend(e, label) {
+    e.stopPropagation(); // prevent card toggle
+
+    // Remove any existing legend
+    const existing = document.getElementById('amenityLegend');
+    if (existing) existing.remove();
+    if (amenityLegendTimer) clearTimeout(amenityLegendTimer);
+
+    // Create legend element positioned near the icon
+    const legend = document.createElement('div');
+    legend.id = 'amenityLegend';
+    legend.className = 'amenity-legend';
+    legend.textContent = label;
+
+    // Position near the tapped icon
+    const rect = e.target.getBoundingClientRect();
+    legend.style.left = Math.max(8, rect.left) + 'px';
+    legend.style.top  = (rect.top + window.scrollY - 36) + 'px';
+
+    document.body.appendChild(legend);
+
+    // Fade in
+    requestAnimationFrame(() => legend.classList.add('visible'));
+
+    // Auto-remove after 2.5 seconds
+    amenityLegendTimer = setTimeout(() => {
+        legend.classList.remove('visible');
+        setTimeout(() => legend.remove(), 200);
+    }, 2500);
 }
 
 // ── Card toggle ───────────────────────────────────────────────

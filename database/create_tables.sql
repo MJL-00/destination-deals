@@ -27,6 +27,10 @@ CREATE TABLE Business (
     website_click_count     INTEGER      NOT NULL DEFAULT 0,
     latitude                DECIMAL(9,6),
     longitude               DECIMAL(9,6),
+    outdoor_dining          BOOLEAN      NOT NULL DEFAULT FALSE,
+    live_music              BOOLEAN      NOT NULL DEFAULT FALSE,
+    waterfront              BOOLEAN      NOT NULL DEFAULT FALSE,
+    pet_friendly            BOOLEAN      NOT NULL DEFAULT FALSE,
     CONSTRAINT chk_subscription_tier CHECK (subscription_tier IN ('Basic', 'Premium'))
 );
 

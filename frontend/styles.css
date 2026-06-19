@@ -16,7 +16,7 @@ body {
     color: #333;
 }
 
-.container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 0; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 0; padding-bottom: 100px; }
 
 /* ── Hero ──────────────────────────────────────────────────── */
 .hero {
@@ -210,6 +210,7 @@ select:focus, input[type="text"]:focus {
 }
 
 .deal-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.11); }
+.deal-card:last-child { margin-bottom: 120px; }
 
 /* ── Card summary row ──────────────────────────────────────── */
 .card-summary {
@@ -363,6 +364,93 @@ select:focus, input[type="text"]:focus {
     font-size: 0.82rem;
 }
 
+
+/* ── Amenity icons ──────────────────────────────────────────── */
+.amenity-icons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 6px 0 2px;
+}
+
+.amenity-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: default;
+    position: relative;
+}
+
+/* CSS-only tooltip using data-tooltip — no browser native title duplication */
+.amenity-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: #1a1a2e;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s;
+    z-index: 50;
+}
+
+/* Desktop hover only — on mobile this never fires so no accidental triggers */
+@media (hover: hover) {
+    .amenity-icon:hover::after { opacity: 1; }
+}
+
+/* ── Amenity badges (expanded card) ────────────────────────── */
+.amenity-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.amenity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0faf2;
+    color: #1e7e34;
+    border: 1px solid #c3e6cb;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+
+/* ── Amenity legend popup (mobile tap) ────────────────────── */
+.amenity-legend {
+    position: absolute;
+    background: #1a1a2e;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 500;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s, transform 0.15s;
+}
+
+.amenity-legend.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /* ── Card detail ───────────────────────────────────────────── */
 .card-detail {
     display: none;
@@ -474,6 +562,7 @@ select:focus, input[type="text"]:focus {
     top: 0;
     z-index: 200;
     box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border-radius: 0 0 12px 12px;
 }
 
 .nav-logo { display: flex; align-items: center; text-decoration: none; }
@@ -504,8 +593,8 @@ select:focus, input[type="text"]:focus {
 /* ── Back to top button ────────────────────────────────────── */
 .back-to-top {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
+    bottom: 80px;
+    right: 20px;
     padding: 10px 16px;
     background: #2c6db2;
     color: white;

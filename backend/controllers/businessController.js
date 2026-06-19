@@ -56,7 +56,7 @@ const getBusinessById = async (req, res) => {
 
 // ── CREATE NEW BUSINESS ───────────────────────────────────────
 const createBusiness = async (req, res) => {
-    const { name, address, locationid, phone, website, subscription_tier, latitude, longitude, categoryIds } = req.body;
+    const { name, address, locationid, phone, website, subscription_tier, latitude, longitude, outdoor_dining, live_music, waterfront, pet_friendly, categoryIds } = req.body;
 
     let formattedWebsite = website ? website.trim() : null;
     if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
@@ -72,11 +72,13 @@ const createBusiness = async (req, res) => {
         await client.query('BEGIN');
 
         const businessResult = await client.query(`
-            INSERT INTO business (name, address, phone, website, subscription_tier, latitude, longitude)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO business (name, address, phone, website, subscription_tier, latitude, longitude, outdoor_dining, live_music, waterfront, pet_friendly)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
             RETURNING businessid;
         `, [name, address, phone || null, formattedWebsite, subscription_tier || 'Basic',
-            latitude || null, longitude || null]);
+            latitude || null, longitude || null,
+            outdoor_dining || false, live_music || false,
+            waterfront || false, pet_friendly || false]);
 
         const newBusinessId = businessResult.rows[0].businessid;
 
@@ -109,7 +111,7 @@ const createBusiness = async (req, res) => {
 // ── UPDATE EXISTING BUSINESS ──────────────────────────────────
 const updateBusiness = async (req, res) => {
     const { id } = req.params;
-    const { name, address, phone, website, subscription_tier, is_verified, categoryIds } = req.body;
+    const { name, address, phone, website, subscription_tier, is_verified, latitude, longitude, outdoor_dining, live_music, waterfront, pet_friendly, categoryIds } = req.body;
 
     let formattedWebsite = website ? website.trim() : null;
     if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
@@ -128,10 +130,18 @@ const updateBusiness = async (req, res) => {
                 phone             = $3,
                 website           = $4,
                 subscription_tier = COALESCE($5, subscription_tier),
-                is_verified       = COALESCE($6, is_verified)
-            WHERE businessid = $7
+                is_verified       = COALESCE($6, is_verified),
+                latitude          = $7,
+                longitude         = $8,
+                outdoor_dining    = COALESCE($9,  outdoor_dining),
+                live_music        = COALESCE($10, live_music),
+                waterfront        = COALESCE($11, waterfront),
+                pet_friendly      = COALESCE($12, pet_friendly)
+            WHERE businessid = $13
             RETURNING *;
-        `, [name, address, phone || null, formattedWebsite, subscription_tier, is_verified, id]);
+        `, [name, address, phone || null, formattedWebsite, subscription_tier, is_verified,
+            latitude || null, longitude || null,
+            outdoor_dining, live_music, waterfront, pet_friendly, id]);
 
         if (updateResult.rows.length === 0) {
             await client.query('ROLLBACK');
