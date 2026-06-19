@@ -6,9 +6,11 @@ const dealRoutes = require('./routes/dealRoutes');
 const businessRoutes = require('./routes/businessRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
-
+const prospectRoutes = require('./routes/prospectRoutes');
 
 const pool = require('./db'); // Tells server.js what "pool" means!
+
+
 
 
 const app = express();
@@ -24,6 +26,7 @@ app.use('/deals', dealRoutes);
 app.use('/businesses', businessRoutes);
 app.use('/locations', locationRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/prospects', prospectRoutes);
 
 
 app.get('/dbcheck', async (req, res) => {

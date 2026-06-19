@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - CRM Prospects</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        .topnav { background: #fff; border-bottom: 2px solid #e9ecef; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+        .topnav .brand { font-size: 18px; font-weight: 700; color: #343a40; text-decoration: none; }
+        .topnav .brand span { color: #007BFF; }
+        .topnav .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
+        .topnav .nav-links a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; color: #495057; transition: background 0.15s; }
+        .topnav .nav-links a:hover { background: #f1f3f5; }
+        .topnav .nav-links a.active { background: #e7f1ff; color: #007BFF; }
+
+        .page { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .page-header h1 { margin: 0; font-size: 24px; color: #343a40; }
+
+        /* Pipeline summary bar */
+        .pipeline-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .pipeline-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.15s;
+            white-space: nowrap;
+        }
+        .pipeline-chip:hover { border-color: currentColor; }
+        .pipeline-chip.selected { border-color: currentColor; }
+
+        /* Filter bar */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .filter-bar input { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; width: 260px; }
+        .filter-bar input:focus { border-color: #80bdff; outline: 0; }
+        .results-count { margin-left: auto; font-size: 13px; color: #6c757d; }
+
+        /* Add prospect form */
+        .add-form {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        .add-form.open { display: block; }
+        .add-form h3 { margin: 0 0 16px; font-size: 15px; color: #343a40; }
+        .add-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
+        .add-field label { display: block; font-size: 11px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .add-field input, .add-field textarea, .add-field select {
+            width: 100%; padding: 8px 10px; border: 1px solid #ced4da;
+            border-radius: 4px; font-size: 13px; font-family: inherit;
+        }
+        .add-field input:focus, .add-field textarea:focus, .add-field select:focus { border-color: #80bdff; outline: 0; }
+        .add-field textarea { resize: vertical; min-height: 60px; }
+        .add-actions { display: flex; gap: 8px; }
+
+        /* Table */
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 960px; }
+        thead th { background: #f8f9fa; text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #6c757d; border-bottom: 2px solid #e9ecef; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid #f1f3f5; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #f8f9fa; }
+        tbody td { padding: 10px 14px; vertical-align: middle; }
+
+        /* Status dropdown in row */
+        .status-select {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: center;
+        }
+
+        /* Status colors */
+        .s-not_approached        { background: #f1f3f5; color: #6c757d; }
+        .s-initial_contact_made  { background: #e7f1ff; color: #0056b3; }
+        .s-follow_up_required    { background: #fff3cd; color: #856404; }
+        .s-waiting_for_response  { background: #e8d5f5; color: #6f42c1; }
+        .s-deal_setup_pending    { background: #fff3e8; color: #b25500; }
+        .s-converted             { background: #e9f7ec; color: #1e7e34; }
+        .s-not_interested        { background: #fde8e8; color: #b02a2a; }
+        .s-no_response           { background: #f1f3f5; color: #adb5bd; }
+
+        /* Action buttons */
+        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn { padding: 5px 11px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+        .btn:hover { opacity: 0.82; }
+        .btn-notes  { background: #e7f1ff; color: #0056b3; }
+        .btn-edit   { background: #f1f3f5; color: #495057; }
+        .btn-delete { background: #fde8e8; color: #b02a2a; }
+        .btn-save   { background: #007BFF; color: white; padding: 7px 16px; font-size: 13px; }
+        .btn-cancel { background: #f1f3f5; color: #495057; padding: 7px 14px; font-size: 13px; }
+        .btn-add    { padding: 9px 18px; background: #007BFF; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-add:hover { background: #0056b3; }
+        .btn-convert { background: #e9f7ec; color: #1e7e34; font-size: 11px; }
+
+        .empty-row td { text-align: center; color: #adb5bd; padding: 48px; font-size: 14px; }
+
+        /* Notes expand panel */
+        .notes-row td { padding: 0 !important; border-bottom: 2px solid #007BFF !important; }
+        .notes-panel { background: #f0f6ff; border-top: 1px solid #cce0ff; padding: 18px 24px; }
+        .notes-panel h4 { margin: 0 0 12px; font-size: 13px; color: #0056b3; }
+        .note-entry { background: white; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px 14px; margin-bottom: 8px; }
+        .note-entry .note-text { font-size: 13px; color: #333; margin-bottom: 4px; }
+        .note-entry .note-meta { font-size: 11px; color: #adb5bd; }
+        .note-add { display: flex; gap: 8px; margin-top: 12px; }
+        .note-add textarea { flex: 1; padding: 8px 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; font-family: inherit; resize: none; height: 60px; }
+        .note-add textarea:focus { border-color: #80bdff; outline: 0; }
+        .btn-note-save { background: #007BFF; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; align-self: flex-end; }
+        .btn-note-save:hover { background: #0056b3; }
+        .latest-note { font-size: 12px; color: #6c757d; font-style: italic; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .no-notes { font-size: 12px; color: #adb5bd; }
+
+        /* Follow-up date */
+        .followup-cell { display: flex; flex-direction: column; gap: 4px; }
+        .followup-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+        .followup-green  { background: #e9f7ec; color: #1e7e34; }
+        .followup-yellow { background: #fff3cd; color: #856404; }
+        .followup-red    { background: #fde8e8; color: #b02a2a; }
+        .followup-input  { font-size: 11px; border: 1px solid #ced4da; border-radius: 4px; padding: 3px 6px; color: #333; cursor: pointer; }
+        .followup-input:focus { border-color: #80bdff; outline: 0; }
+        .followup-clear { font-size: 10px; color: #adb5bd; background: none; border: none; cursor: pointer; padding: 0; }
+        .followup-clear:hover { color: #b02a2a; }
+
+        /* Edit panel */
+        .edit-row td { padding: 0 !important; border-bottom: 2px solid #495057 !important; }
+        .edit-panel { background: #f8f9fa; border-top: 1px solid #dee2e6; padding: 18px 24px; }
+        .edit-panel h4 { margin: 0 0 14px; font-size: 13px; color: #343a40; }
+        .edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 14px; }
+        .edit-field label { display: block; font-size: 11px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .edit-field input, .edit-field textarea {
+            width: 100%; padding: 7px 10px; border: 1px solid #ced4da;
+            border-radius: 4px; font-size: 13px; font-family: inherit; background: white;
+        }
+        .edit-field textarea { resize: vertical; min-height: 60px; }
+        .edit-field input:focus, .edit-field textarea:focus { border-color: #80bdff; outline: 0; }
+
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .toast.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <a class="brand" href="admin-index.html">Destination <span>Deals</span> Admin</a>
+    <div class="nav-links">
+        <a href="admin-index.html">Dashboard</a>
+        <a href="businesses-list.html">Businesses</a>
+        <a href="deals-list.html">Deals</a>
+        <a href="add-business.html">+ Add Business</a>
+        <a href="add-deal.html">+ Add Deal</a>
+        <a href="crm.html" class="active">CRM</a>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="page-header">
+        <h1>Prospect CRM</h1>
+        <button class="btn-add" onclick="toggleAddForm()">+ Add Prospect</button>
+    </div>
+
+    <!-- Pipeline summary chips -->
+    <div class="pipeline-bar" id="pipelineBar"></div>
+
+    <!-- Add prospect form -->
+    <div class="add-form" id="addForm">
+        <h3>New Prospect</h3>
+        <div class="add-grid">
+            <div class="add-field">
+                <label>Business Name *</label>
+                <input id="add-name" placeholder="e.g. The Black Pearl">
+            </div>
+            <div class="add-field">
+                <label>Address</label>
+                <input id="add-address" placeholder="e.g. 100 Thames St">
+            </div>
+            <div class="add-field" style="grid-column: span 2;">
+                <label>City / Region</label>
+                <select id="add-location">
+                    <option value="">-- Select a Location --</option>
+                </select>
+            </div>
+            <div class="add-field">
+                <label>Phone</label>
+                <input id="add-phone" placeholder="(401) 555-0100">
+            </div>
+            <div class="add-field">
+                <label>Website</label>
+                <input id="add-website" placeholder="https://...">
+            </div>
+            <div class="add-field">
+                <label>Contact Name</label>
+                <input id="add-contact" placeholder="Manager or Owner name">
+            </div>
+            <div class="add-field">
+                <label>Contact Email</label>
+                <input id="add-email" type="email" placeholder="owner@example.com">
+            </div>
+            <div class="add-field" style="grid-column: span 2;">
+                <label>Category / Notes</label>
+                <textarea id="add-notes" placeholder="e.g. Restaurant, outdoor patio, owner is friendly — good prospect"></textarea>
+            </div>
+        </div>
+        <div class="add-actions">
+            <button class="btn btn-save" onclick="addProspect()">Save Prospect</button>
+            <button class="btn btn-cancel" onclick="toggleAddForm()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="Search by name, city, or contact...">
+        <span class="results-count" id="resultsCount"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Business</th>
+                    <th>Location</th>
+                    <th>Contact</th>
+                    <th>Stage</th>
+                    <th style="max-width:180px; width:180px;">Latest Note</th>
+                    <th>Follow-up</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="crm-tbody">
+                <tr class="empty-row"><td colspan="8">Loading prospects...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../config.js"></script>
+<script>
+    let allProspects = [];
+    let activeFilter = '';
+    let openNotesId  = null;
+    let openEditId   = null;
+
+    const STATUSES = [
+        { value: 'not_approached',       label: 'Not Approached',      bg: '#f1f3f5', color: '#6c757d' },
+        { value: 'initial_contact_made', label: 'Initial Contact',     bg: '#e7f1ff', color: '#0056b3' },
+        { value: 'follow_up_required',   label: 'Follow Up Required',  bg: '#fff3cd', color: '#856404' },
+        { value: 'waiting_for_response', label: 'Waiting for Response',bg: '#e8d5f5', color: '#6f42c1' },
+        { value: 'deal_setup_pending',   label: 'Deal Setup Pending',  bg: '#fff3e8', color: '#b25500' },
+        { value: 'converted',            label: 'Converted',           bg: '#e9f7ec', color: '#1e7e34' },
+        { value: 'not_interested',       label: 'Not Interested',      bg: '#fde8e8', color: '#b02a2a' },
+        { value: 'no_response',          label: 'No Response',         bg: '#f1f3f5', color: '#adb5bd' },
+    ];
+
+    function statusMeta(val) {
+        return STATUSES.find(s => s.value === val) || { label: val, bg: '#f1f3f5', color: '#6c757d' };
+    }
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast ${type}`;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3500);
+    }
+
+    function formatDate(str) {
+        if (!str) return '—';
+        return new Date(str).toLocaleDateString('en-US',
+            { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // ── Follow-up date helpers ───────────────────────────────
+    function followUpStatus(dateStr) {
+        if (!dateStr) return null;
+        const today    = new Date(); today.setHours(0,0,0,0);
+        const followUp = new Date(dateStr); followUp.setHours(0,0,0,0);
+        const diffDays = Math.round((followUp - today) / 86400000);
+        if (diffDays < 0)  return { cls: 'followup-red',    label: `${dateStr} — Overdue` };
+        if (diffDays <= 4) return { cls: 'followup-yellow', label: `Follow up ${formatDate(dateStr)}` };
+        return             { cls: 'followup-green',          label: `Follow up ${formatDate(dateStr)}` };
+    }
+
+    async function setFollowUp(id, dateVal) {
+        try {
+            await fetch(`${API_URL}/prospects/${id}/followup`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ follow_up_date: dateVal || null })
+            });
+            const p = allProspects.find(x => x.prospectid === id);
+            if (p) p.follow_up_date = dateVal || null;
+            renderPipelineBar();
+            applyFilter();
+        } catch (e) {
+            showToast('Error saving follow-up date.', 'error');
+        }
+    }
+
+    // ── Pipeline summary chips ────────────────────────────────
+    function renderPipelineBar() {
+        const bar = document.getElementById('pipelineBar');
+        bar.innerHTML = '';
+
+        // All chip
+        const allChip = document.createElement('div');
+        allChip.className = 'pipeline-chip' + (activeFilter === '' ? ' selected' : '');
+        allChip.style.cssText = `background:#f1f3f5; color:#333;`;
+        allChip.textContent = `All (${allProspects.length})`;
+        allChip.onclick = () => { activeFilter = ''; renderPipelineBar(); applyFilter(); };
+        bar.appendChild(allChip);
+
+        // Due This Week chip
+        const today   = new Date(); today.setHours(0,0,0,0);
+        const weekOut = new Date(today); weekOut.setDate(weekOut.getDate() + 7);
+        const dueCount = allProspects.filter(p => {
+            if (!p.follow_up_date) return false;
+            const d = new Date(p.follow_up_date); d.setHours(0,0,0,0);
+            return d <= weekOut;
+        }).length;
+
+        if (dueCount > 0) {
+            const dueChip = document.createElement('div');
+            dueChip.className = 'pipeline-chip' + (activeFilter === '__due__' ? ' selected' : '');
+            dueChip.style.cssText = `background:#fff3cd; color:#856404;`;
+            dueChip.textContent = `Due This Week (${dueCount})`;
+            dueChip.onclick = () => {
+                activeFilter = activeFilter === '__due__' ? '' : '__due__';
+                renderPipelineBar();
+                applyFilter();
+            };
+            bar.appendChild(dueChip);
+        }
+
+        STATUSES.forEach(s => {
+            const count = allProspects.filter(p => p.status === s.value).length;
+            if (count === 0) return;
+            const chip = document.createElement('div');
+            chip.className = 'pipeline-chip' + (activeFilter === s.value ? ' selected' : '');
+            chip.style.cssText = `background:${s.bg}; color:${s.color};`;
+            chip.textContent = `${s.label} (${count})`;
+            chip.onclick = () => {
+                activeFilter = activeFilter === s.value ? '' : s.value;
+                renderPipelineBar();
+                applyFilter();
+            };
+            bar.appendChild(chip);
+        });
+    }
+
+    // ── Render table ──────────────────────────────────────────
+    function renderTable(prospects) {
+        const tbody = document.getElementById('crm-tbody');
+        document.getElementById('resultsCount').textContent =
+            `${prospects.length} prospect${prospects.length !== 1 ? 's' : ''}`;
+
+        if (!prospects.length) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No prospects match your filters.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = prospects.map(p => {
+            const meta    = statusMeta(p.status);
+            const loc     = [p.city, p.state].filter(Boolean).join(', ') || '—';
+            const contact = p.contact_name || '—';
+            const notePreview = p.latest_note
+                ? `<span class="latest-note" title="${p.latest_note.replace(/"/g,'&quot;')}">${p.latest_note}</span>`
+                : `<span class="no-notes">No notes yet</span>`;
+            const noteCount = parseInt(p.note_count) || 0;
+            const notesLabel = noteCount > 1 ? `Notes (${noteCount})` : 'Notes';
+
+            // Status dropdown
+            const statusOpts = STATUSES.map(s =>
+                `<option value="${s.value}" ${p.status === s.value ? 'selected' : ''}>${s.label}</option>`
+            ).join('');
+
+            const convertBtn = p.status === 'deal_setup_pending' && !p.businessid
+                ? `<button class="btn btn-convert" onclick="convertProspect(${p.prospectid})">Convert</button>`
+                : '';
+
+            return `
+            <tr id="prospect-row-${p.prospectid}">
+                <td><strong>${p.business_name}</strong></td>
+                <td style="font-size:12px;color:#6c757d;">${loc}</td>
+                <td style="font-size:12px;">${contact}</td>
+                <td>
+                    <select class="status-select s-${p.status}"
+                        onchange="changeStatus(${p.prospectid}, this)">
+                        ${statusOpts}
+                    </select>
+                </td>
+                <td style="max-width:180px; overflow:hidden;">${notePreview}</td>
+                <td>
+                    <div class="followup-cell">
+                        ${(() => {
+                            const fs = followUpStatus(p.follow_up_date);
+                            return fs
+                                ? `<span class="followup-badge ${fs.cls}">${fs.label}</span>
+                                   <button class="followup-clear" onclick="setFollowUp(${p.prospectid}, '')">✕ Clear</button>`
+                                : '';
+                        })()}
+                        <input type="date" class="followup-input"
+                            value="${p.follow_up_date ? p.follow_up_date.slice(0,10) : ''}"
+                            title="Set follow-up date"
+                            onchange="setFollowUp(${p.prospectid}, this.value)">
+                    </div>
+                </td>
+                <td style="font-size:12px;color:#adb5bd;">${formatDate(p.updated_at)}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-notes" onclick="toggleNotes(${p.prospectid})">${notesLabel}</button>
+                        <button class="btn btn-edit"  onclick="toggleEdit(${p.prospectid})">Edit</button>
+                        ${convertBtn}
+                        <button class="btn btn-delete" onclick="deleteProspect(${p.prospectid}, '${p.business_name.replace(/'/g,"\\'")}')">Delete</button>
+                    </div>
+                </td>
+            </tr>
+            <tr class="notes-row" id="notes-row-${p.prospectid}" style="display:none;">
+                <td colspan="8">
+                    <div class="notes-panel">
+                        <h4>Notes — ${p.business_name}</h4>
+                        <div id="notes-list-${p.prospectid}">Loading...</div>
+                        <div class="note-add">
+                            <textarea id="note-input-${p.prospectid}" placeholder="Add a note about this visit or call..."></textarea>
+                            <button class="btn-note-save" onclick="saveNote(${p.prospectid})">Add Note</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="edit-row" id="edit-row-${p.prospectid}" style="display:none;">
+                <td colspan="8">
+                    <div class="edit-panel">
+                        <h4>Edit: ${p.business_name}</h4>
+                        <div class="edit-grid">
+                            <div class="edit-field">
+                                <label>Business Name</label>
+                                <input id="ep-name-${p.prospectid}" value="${(p.business_name||'').replace(/"/g,'&quot;')}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Address</label>
+                                <input id="ep-addr-${p.prospectid}" value="${(p.address||'').replace(/"/g,'&quot;')}">
+                            </div>
+                            <div class="edit-field" style="grid-column: span 2;">
+                                <label>City / Region</label>
+                                <select id="ep-loc-${p.prospectid}" class="ep-loc-select">
+                                    <option value="">-- Select a Location --</option>
+                                </select>
+                            </div>
+                            <div class="edit-field">
+                                <label>Phone</label>
+                                <input id="ep-phone-${p.prospectid}" value="${p.phone||''}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Website</label>
+                                <input id="ep-web-${p.prospectid}" value="${p.website||''}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Contact Name</label>
+                                <input id="ep-contact-${p.prospectid}" value="${(p.contact_name||'').replace(/"/g,'&quot;')}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Contact Email</label>
+                                <input id="ep-email-${p.prospectid}" value="${p.contact_email||''}">
+                            </div>
+                            <div class="edit-field" style="grid-column:span 2;">
+                                <label>Category / Notes</label>
+                                <textarea id="ep-catnotes-${p.prospectid}">${p.category_notes||''}</textarea>
+                            </div>
+                        </div>
+                        <div class="add-actions">
+                            <button class="btn btn-save" onclick="saveEdit(${p.prospectid})">Save Changes</button>
+                            <button class="btn btn-cancel" onclick="toggleEdit(${p.prospectid})">Cancel</button>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function applyFilter() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        let filtered = allProspects;
+        if (activeFilter === '__due__') {
+            const today   = new Date(); today.setHours(0,0,0,0);
+            const weekOut = new Date(today); weekOut.setDate(weekOut.getDate() + 7);
+            filtered = filtered.filter(p => {
+                if (!p.follow_up_date) return false;
+                const d = new Date(p.follow_up_date); d.setHours(0,0,0,0);
+                return d <= weekOut;
+            });
+        } else if (activeFilter) {
+            filtered = filtered.filter(p => p.status === activeFilter);
+        }
+        if (search) filtered = filtered.filter(p =>
+            (p.business_name||'').toLowerCase().includes(search) ||
+            (p.city||'').toLowerCase().includes(search) ||
+            (p.contact_name||'').toLowerCase().includes(search)
+        );
+        renderTable(filtered);
+        // Populate location dropdowns in any visible edit panels
+        if (cachedLocations.length) populateEditDropdowns();
+    }
+
+    // ── Load prospects ────────────────────────────────────────
+    async function loadProspects() {
+        try {
+            const res = await fetch(`${API_URL}/prospects`);
+            allProspects = await res.json();
+            renderPipelineBar();
+            applyFilter();
+        } catch (e) {
+            document.getElementById('crm-tbody').innerHTML =
+                '<tr class="empty-row"><td colspan="8">Could not load prospects. Is the server running?</td></tr>';
+        }
+    }
+
+    // ── Add prospect ──────────────────────────────────────────
+    function toggleAddForm() {
+        document.getElementById('addForm').classList.toggle('open');
+    }
+
+    async function addProspect() {
+        const name = document.getElementById('add-name').value.trim();
+        if (!name) { showToast('Business name is required.', 'error'); return; }
+
+        const payload = {
+            business_name:  name,
+            address:        document.getElementById('add-address').value.trim() || null,
+            city:           document.getElementById('add-location').selectedOptions[0]?.dataset.city || null,
+            state:          document.getElementById('add-location').selectedOptions[0]?.dataset.state || null,
+            phone:          document.getElementById('add-phone').value.trim() || null,
+            website:        document.getElementById('add-website').value.trim() || null,
+            contact_name:   document.getElementById('add-contact').value.trim() || null,
+            contact_email:  document.getElementById('add-email').value.trim() || null,
+            category_notes: document.getElementById('add-notes').value.trim() || null,
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/prospects`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Failed');
+            document.getElementById('addForm').classList.remove('open');
+            document.getElementById('addForm').querySelectorAll('input,textarea').forEach(el => el.value = '');
+            showToast(`"${name}" added to CRM.`);
+            loadProspects();
+        } catch (e) {
+            showToast('Error adding prospect.', 'error');
+        }
+    }
+
+    // ── Change status ─────────────────────────────────────────
+    async function changeStatus(id, selectEl) {
+        const newStatus = selectEl.value;
+        // Update dropdown color immediately
+        selectEl.className = `status-select s-${newStatus}`;
+        try {
+            const res = await fetch(`${API_URL}/prospects/${id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (!res.ok) throw new Error('Failed');
+            const p = allProspects.find(x => x.prospectid === id);
+            if (p) p.status = newStatus;
+            renderPipelineBar();
+            showToast('Stage updated.');
+        } catch (e) {
+            showToast('Error updating stage.', 'error');
+            loadProspects(); // revert on error
+        }
+    }
+
+    // ── Notes panel ───────────────────────────────────────────
+    async function toggleNotes(id) {
+        // Close edit if open
+        if (openEditId) {
+            document.getElementById(`edit-row-${openEditId}`).style.display = 'none';
+            openEditId = null;
+        }
+        const row = document.getElementById(`notes-row-${id}`);
+        const isOpen = row.style.display !== 'none';
+        if (openNotesId && openNotesId !== id) {
+            document.getElementById(`notes-row-${openNotesId}`).style.display = 'none';
+        }
+        row.style.display = isOpen ? 'none' : 'table-row';
+        openNotesId = isOpen ? null : id;
+        if (!isOpen) await loadNotes(id);
+    }
+
+    async function loadNotes(id) {
+        const container = document.getElementById(`notes-list-${id}`);
+        try {
+            const res   = await fetch(`${API_URL}/prospects/${id}/notes`);
+            const notes = await res.json();
+            if (!notes.length) {
+                container.innerHTML = '<p style="font-size:13px;color:#adb5bd;margin:0 0 8px;">No notes yet — add the first one below.</p>';
+                return;
+            }
+            container.innerHTML = notes.map(n => `
+                <div class="note-entry">
+                    <div class="note-text">${n.note}</div>
+                    <div class="note-meta">${new Date(n.created_at).toLocaleString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+                </div>`).join('');
+        } catch (e) {
+            container.innerHTML = '<p style="color:#b02a2a;font-size:13px;">Could not load notes.</p>';
+        }
+    }
+
+    async function saveNote(id) {
+        const input = document.getElementById(`note-input-${id}`);
+        const note  = input.value.trim();
+        if (!note) { showToast('Note cannot be empty.', 'error'); return; }
+        try {
+            const res = await fetch(`${API_URL}/prospects/${id}/notes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ note })
+            });
+            if (!res.ok) throw new Error('Failed');
+            input.value = '';
+            await loadNotes(id);
+            // Refresh latest note in table
+            const res2 = await fetch(`${API_URL}/prospects`);
+            allProspects = await res2.json();
+            showToast('Note saved.');
+            renderPipelineBar();
+            applyFilter();
+        } catch (e) {
+            showToast('Error saving note.', 'error');
+        }
+    }
+
+    // ── Edit panel ────────────────────────────────────────────
+    function toggleEdit(id) {
+        if (openNotesId) {
+            document.getElementById(`notes-row-${openNotesId}`).style.display = 'none';
+            openNotesId = null;
+        }
+        const row = document.getElementById(`edit-row-${id}`);
+        const isOpen = row.style.display !== 'none';
+        if (openEditId && openEditId !== id) {
+            document.getElementById(`edit-row-${openEditId}`).style.display = 'none';
+        }
+        row.style.display = isOpen ? 'none' : 'table-row';
+        openEditId = isOpen ? null : id;
+    }
+
+    async function saveEdit(id) {
+        const payload = {
+            business_name:  document.getElementById(`ep-name-${id}`).value.trim(),
+            address:        document.getElementById(`ep-addr-${id}`).value.trim() || null,
+            city:           document.getElementById(`ep-loc-${id}`)?.selectedOptions[0]?.dataset.city || null,
+            state:          document.getElementById(`ep-loc-${id}`)?.selectedOptions[0]?.dataset.state || null,
+            phone:          document.getElementById(`ep-phone-${id}`).value.trim() || null,
+            website:        document.getElementById(`ep-web-${id}`).value.trim() || null,
+            contact_name:   document.getElementById(`ep-contact-${id}`).value.trim() || null,
+            contact_email:  document.getElementById(`ep-email-${id}`).value.trim() || null,
+            category_notes: document.getElementById(`ep-catnotes-${id}`).value.trim() || null,
+        };
+        try {
+            const res = await fetch(`${API_URL}/prospects/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Failed');
+            toggleEdit(id);
+            showToast('Prospect updated.');
+            loadProspects();
+        } catch (e) {
+            showToast('Error updating prospect.', 'error');
+        }
+    }
+
+    // ── Convert to platform business ──────────────────────────
+    function convertProspect(id) {
+        const p = allProspects.find(x => x.prospectid === id);
+        if (!p) return;
+        // Pre-fill add-business form via URL params and open it
+        const params = new URLSearchParams({
+            name:    p.business_name,
+            address: p.address || '',
+            phone:   p.phone   || '',
+            website: p.website || '',
+        });
+        window.location.href = `add-business.html?${params.toString()}`;
+    }
+
+    // ── Delete prospect ───────────────────────────────────────
+    async function deleteProspect(id, name) {
+        if (!confirm(`Remove "${name}" from the CRM?\n\nThis will delete all notes. This cannot be undone.`)) return;
+        try {
+            const res = await fetch(`${API_URL}/prospects/${id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error('Failed');
+            allProspects = allProspects.filter(p => p.prospectid !== id);
+            renderPipelineBar();
+            applyFilter();
+            showToast(`"${name}" removed.`);
+        } catch (e) {
+            showToast('Error deleting prospect.', 'error');
+        }
+    }
+
+    document.getElementById('searchInput').addEventListener('input', applyFilter);
+
+    // Populate location dropdowns from existing locations in DB
+    let cachedLocations = [];
+
+    async function loadLocationDropdown() {
+        try {
+            const res  = await fetch(`${API_URL}/locations`);
+            cachedLocations = await res.json();
+
+            // Populate add-form dropdown
+            const sel = document.getElementById('add-location');
+            cachedLocations.forEach(loc => {
+                const opt = document.createElement('option');
+                opt.value         = `${loc.city}, ${loc.state}`;
+                opt.textContent   = `${loc.city}, ${loc.state}`;
+                opt.dataset.city  = loc.city;
+                opt.dataset.state = loc.state;
+                sel.appendChild(opt);
+            });
+        } catch (e) {
+            console.error('Could not load locations:', e);
+        }
+    }
+
+    // Called after renderTable to populate edit panel dropdowns
+    function populateEditDropdowns() {
+        document.querySelectorAll('.ep-loc-select').forEach(sel => {
+            const id = sel.id.replace('ep-loc-', '');
+            const p  = allProspects.find(x => x.prospectid === parseInt(id));
+            if (!p) return;
+
+            // Clear and rebuild
+            sel.innerHTML = '<option value="">-- Select a Location --</option>';
+            cachedLocations.forEach(loc => {
+                const opt = document.createElement('option');
+                opt.value         = `${loc.city}, ${loc.state}`;
+                opt.textContent   = `${loc.city}, ${loc.state}`;
+                opt.dataset.city  = loc.city;
+                opt.dataset.state = loc.state;
+                // Pre-select if matches existing prospect city
+                if (loc.city === p.city && loc.state === p.state) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        });
+    }
+
+    loadLocationDropdown();
+    loadProspects();
+</script>
+</body>
+</html>
