@@ -118,6 +118,7 @@
                     <th>ID</th>
                     <th>Title</th>
                     <th>Business</th>
+                    <th>Location</th>
                     <th>Discount</th>
                     <th>Schedule</th>
                     <th>Views</th>
@@ -126,7 +127,7 @@
                 </tr>
             </thead>
             <tbody id="deals-tbody">
-                <tr class="empty-row"><td colspan="8">Loading deals...</td></tr>
+                <tr class="empty-row"><td colspan="9">Loading deals...</td></tr>
             </tbody>
         </table>
     </div>
@@ -156,11 +157,33 @@
     }
 
     function formatSchedule(d) {
-        if (!d.days) return '—';
-        const time = d.starttime && d.endtime
-            ? ` ${d.starttime.slice(0,5)}–${d.endtime.slice(0,5)}`
-            : '';
-        return d.days + time;
+        const parts = [];
+
+        // Days + time
+        if (d.days) {
+            const time = d.starttime && d.endtime
+                ? ` ${d.starttime.slice(0,5)}–${d.endtime.slice(0,5)}`
+                : '';
+            parts.push(d.days + time);
+        }
+
+        // Limited time offer dates
+        if (d.startdate || d.enddate) {
+            const start = d.startdate ? formatDateShort(d.startdate) : null;
+            const end   = d.enddate   ? formatDateShort(d.enddate)   : null;
+            if (start && end) parts.push(`Live: ${start} → ${end}`);
+            else if (start)   parts.push(`Goes live: ${start}`);
+            else if (end)     parts.push(`Expires: ${end}`);
+        }
+
+        return parts.length ? parts.join('<br>') : '—';
+    }
+
+    function formatDateShort(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function renderTable(deals) {
@@ -169,7 +192,7 @@
             `${deals.length} deal${deals.length !== 1 ? 's' : ''}`;
 
         if (!deals.length) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No deals match your filters.</td></tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No deals match your filters.</td></tr>';
             return;
         }
 
@@ -202,8 +225,9 @@
                 <td>${d.dealid}</td>
                 <td><strong>${d.title}</strong></td>
                 <td>${d.business_name || '—'}</td>
+                <td style="font-size:12px;color:#6c757d;">${d.city && d.state ? `${d.city}, ${d.state}` : '—'}</td>
                 <td>${formatDiscount(d)}</td>
-                <td style="font-size:12px;color:#6c757d;">${formatSchedule(d)}</td>
+                <td style="font-size:12px;color:#6c757d;line-height:1.6;">${formatSchedule(d)}</td>
                 <td>${(d.click_count || 0).toLocaleString()}</td>
                 <td>${statusBadge}</td>
                 <td>
@@ -215,7 +239,7 @@
                 </td>
             </tr>
             <tr class="edit-row" id="edit-row-${d.dealid}" style="display:none;">
-                <td colspan="8">
+                <td colspan="9">
                     <div class="edit-panel">
                         <h4>Editing: ${d.title}</h4>
                         <div class="edit-grid">
@@ -389,7 +413,7 @@
             applyFilters();
         } catch (e) {
             document.getElementById('deals-tbody').innerHTML =
-                '<tr class="empty-row"><td colspan="8">Could not load deals. Is the server running?</td></tr>';
+                '<tr class="empty-row"><td colspan="9">Could not load deals. Is the server running?</td></tr>';
         }
     }
 
