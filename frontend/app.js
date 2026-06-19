@@ -311,10 +311,14 @@ function formatDistance(miles) {
 }
 
 function formatDiscount(deal) {
-    if (!deal.discountvalue || deal.discountvalue == 0) return deal.discounttype || '';
-    if (deal.discounttype === 'Percent') return `${parseFloat(deal.discountvalue)}% OFF`;
-    if (deal.discounttype === 'Flat')    return `$${parseFloat(deal.discountvalue)} OFF`;
-    return deal.discounttype;
+    const val  = parseFloat(deal.discountvalue);
+    const type = deal.discounttype || '';
+
+    if (type === 'Percent' && val > 0) return `${val}% OFF`;
+    if (type === 'Flat'    && val > 0) return `$${val} OFF`;
+    if (type === 'BOGO')               return 'BOGO';
+    // Flat with no value, Custom, or anything else — show nothing
+    return '';
 }
 
 function formatEndDate(enddate) {

@@ -8,6 +8,18 @@
 </head>
 <body>
 
+<!-- ── Nav bar ── -->
+<nav class="consumer-nav" id="consumerNav">
+    <a href="index.html" class="nav-logo" onclick="resetHome(event)">
+        <img src="images/default_logo.png" alt="Destination Deals" class="nav-logo-img">
+    </a>
+    <div class="nav-links">
+        <a href="index.html" class="nav-link active" onclick="resetHome(event)">Home</a>
+        <a href="about.html" class="nav-link">About</a>
+        <a href="contact.html" class="nav-link">Contact</a>
+    </div>
+</nav>
+
 <div class="container">
 
     <!-- Hero -->
@@ -15,7 +27,9 @@
         <img
             src="images/default_logo.png"
             alt="Destination Deals"
-            class="hero-logo-img">
+            class="hero-logo-img"
+            onclick="resetHome()"
+            style="cursor:pointer;">
         <p class="tagline">
             Discover local savings, activities, shopping, and dining.
         </p>
@@ -33,7 +47,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="filters">
+    <div class="filters" id="filtersBar">
         <div class="filter-group">
             <label>Location</label>
             <select id="locationSelect">
@@ -98,7 +112,38 @@
 
 </div>
 
+<!-- Back to top button -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    ↑ Top
+</button>
+
 <script src="config.js"></script>
 <script src="app.js"></script>
+<script>
+    // ── Back to top ───────────────────────────────────────────
+    const backToTop   = document.getElementById('backToTop');
+    const filtersBar  = document.getElementById('filtersBar');
+
+    window.addEventListener('scroll', () => {
+        const filtersBottom = filtersBar.getBoundingClientRect().bottom;
+        backToTop.classList.toggle('visible', filtersBottom < 0);
+    });
+
+    // ── Logo / home reset ─────────────────────────────────────
+    function resetHome(e) {
+        if (e) e.preventDefault();
+        // Reset all filters
+        document.getElementById('locationSelect').value = '';
+        document.getElementById('categorySelect').value = '';
+        document.getElementById('daySelect').value      = '';
+        document.getElementById('searchInput').value    = '';
+        document.getElementById('sortSelect').value     = 'default';
+        // Reset background to default
+        document.body.style.backgroundImage =
+            `linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)), url('images/default_background.png')`;
+        // Trigger welcome state in app.js
+        if (typeof showWelcomeState === 'function') showWelcomeState();
+    }
+</script>
 </body>
 </html>

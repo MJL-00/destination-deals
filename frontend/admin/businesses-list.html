@@ -10,7 +10,7 @@
         .topnav { background: #fff; border-bottom: 2px solid #e9ecef; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
         .topnav .brand { font-size: 18px; font-weight: 700; color: #343a40; text-decoration: none; }
         .topnav .brand span { color: #007BFF; }
-        .topnav .nav-links { display: flex; gap: 8px; }
+        .topnav .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
         .topnav .nav-links a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; color: #495057; transition: background 0.15s; }
         .topnav .nav-links a:hover { background: #f1f3f5; }
         .topnav .nav-links a.active { background: #e7f1ff; color: #007BFF; }
@@ -19,15 +19,11 @@
         .page-header h1 { margin: 0; font-size: 24px; color: #343a40; }
         .add-btn { padding: 9px 18px; background: #007BFF; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; transition: background 0.2s; }
         .add-btn:hover { background: #0056b3; }
-
-        /* Filter bar */
         .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
         .filter-bar input { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; width: 220px; }
         .filter-bar select { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
         .filter-bar input:focus, .filter-bar select:focus { border-color: #80bdff; outline: 0; }
         .results-count { margin-left: auto; font-size: 13px; color: #6c757d; }
-
-        /* Table */
         .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px; }
         thead th { background: #f8f9fa; text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #6c757d; border-bottom: 2px solid #e9ecef; white-space: nowrap; }
@@ -35,25 +31,42 @@
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #f8f9fa; }
         tbody td { padding: 10px 14px; vertical-align: middle; }
-
         .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
         .badge-premium    { background: #e7f1ff; color: #0056b3; }
         .badge-basic      { background: #fff3e8; color: #b25500; }
         .badge-verified   { background: #e9f7ec; color: #1e7e34; }
         .badge-unverified { background: #fde8e8; color: #b02a2a; }
-
-        /* Action buttons */
         .actions { display: flex; gap: 6px; flex-wrap: wrap; }
         .btn { padding: 5px 11px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
         .btn:hover { opacity: 0.82; }
-        .btn-verify   { background: #e9f7ec; color: #1e7e34; }
-        .btn-unverify { background: #fde8e8; color: #b02a2a; }
-        .btn-tier     { background: #e7f1ff; color: #0056b3; }
-        .btn-delete   { background: #fde8e8; color: #b02a2a; }
-
+        .btn-edit   { background: #e7f1ff; color: #0056b3; }
+        .btn-delete { background: #fde8e8; color: #b02a2a; }
+        .btn-save     { background: #007BFF; color: white; padding: 7px 16px; font-size: 13px; }
+        .btn-cancel   { background: #f1f3f5; color: #495057; padding: 7px 14px; font-size: 13px; }
         .empty-row td { text-align: center; color: #adb5bd; padding: 48px; font-size: 14px; }
 
-        /* Toast */
+        /* ── Inline edit panel ── */
+        .edit-row td { padding: 0 !important; border-bottom: 2px solid #007BFF !important; }
+        .edit-panel {
+            background: #f0f6ff;
+            border-top: 1px solid #cce0ff;
+            padding: 20px 24px;
+        }
+        .edit-panel h4 { margin: 0 0 16px; font-size: 14px; color: #0056b3; }
+        .edit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .edit-field label { display: block; font-size: 11px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .edit-field input, .edit-field select {
+            width: 100%; padding: 7px 10px; border: 1px solid #ced4da;
+            border-radius: 4px; font-size: 13px; background: white;
+        }
+        .edit-field input:focus, .edit-field select:focus { border-color: #80bdff; outline: 0; }
+        .edit-actions { display: flex; gap: 8px; }
+
         .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .toast.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -62,11 +75,13 @@
 <body>
 
 <nav class="topnav">
-    <a class="brand" href="index.html">Destination <span>Deals</span> Admin</a>
+    <a class="brand" href="admin-index.html">Destination <span>Deals</span> Admin</a>
     <div class="nav-links">
-        <a href="index.html">Dashboard</a>
+        <a href="admin-index.html">Dashboard</a>
         <a href="businesses-list.html" class="active">Businesses</a>
         <a href="deals-list.html">Deals</a>
+        <a href="add-business.html">+ Add Business</a>
+        <a href="add-deal.html">+ Add Deal</a>
     </div>
 </nav>
 
@@ -92,7 +107,7 @@
     </div>
 
     <div class="table-wrap">
-        <table>
+        <table id="bizTable">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -120,8 +135,8 @@
 <script src="../config.js"></script>
 <script>
     let allBusinesses = [];
+    let openEditId = null;
 
-    // ── Toast helper ──────────────────────────────────────────────
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         toast.textContent = message;
@@ -130,7 +145,6 @@
         setTimeout(() => { toast.style.display = 'none'; }, 3500);
     }
 
-    // ── Render table ──────────────────────────────────────────────
     function renderTable(businesses) {
         const tbody = document.getElementById('businesses-tbody');
         document.getElementById('resultsCount').textContent =
@@ -145,20 +159,11 @@
             const tierBadge = b.subscription_tier === 'Premium'
                 ? '<span class="badge badge-premium">Premium</span>'
                 : '<span class="badge badge-basic">Basic</span>';
-
             const verifiedBadge = b.is_verified
                 ? '<span class="badge badge-verified">Verified</span>'
                 : '<span class="badge badge-unverified">Unverified</span>';
-
-            const verifyBtn = b.is_verified
-                ? `<button class="btn btn-unverify" onclick="toggleVerified(${b.businessid}, false)">Unverify</button>`
-                : `<button class="btn btn-verify"   onclick="toggleVerified(${b.businessid}, true)">Verify</button>`;
-
-            const tierBtn = b.subscription_tier === 'Premium'
-                ? `<button class="btn btn-tier" onclick="toggleTier(${b.businessid}, 'Basic')">→ Basic</button>`
-                : `<button class="btn btn-tier" onclick="toggleTier(${b.businessid}, 'Premium')">→ Premium</button>`;
-
-            return `<tr id="biz-row-${b.businessid}">
+            return `
+            <tr id="biz-row-${b.businessid}">
                 <td>${b.businessid}</td>
                 <td><strong>${b.name}</strong></td>
                 <td>${b.address || '—'}</td>
@@ -171,47 +176,134 @@
                 <td>${b.website_click_count || 0}</td>
                 <td>
                     <div class="actions">
-                        ${verifyBtn}
-                        ${tierBtn}
+                        <button class="btn btn-edit" onclick="toggleEditPanel(${b.businessid})">Edit</button>
                         <button class="btn btn-delete" onclick="deleteBusiness(${b.businessid}, '${b.name.replace(/'/g, "\\'")}')">Delete</button>
+                    </div>
+                </td>
+            </tr>
+            <tr class="edit-row" id="edit-row-${b.businessid}" style="display:none;">
+                <td colspan="11">
+                    <div class="edit-panel">
+                        <h4>Editing: ${b.name}</h4>
+                        <div class="edit-grid">
+                            <div class="edit-field">
+                                <label>Business Name</label>
+                                <input id="edit-name-${b.businessid}" value="${(b.name || '').replace(/"/g, '&quot;')}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Street Address</label>
+                                <input id="edit-address-${b.businessid}" value="${(b.address || '').replace(/"/g, '&quot;')}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Phone</label>
+                                <input id="edit-phone-${b.businessid}" value="${b.phone || ''}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Website</label>
+                                <input id="edit-website-${b.businessid}" value="${b.website || ''}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Subscription Tier</label>
+                                <select id="edit-tier-${b.businessid}">
+                                    <option value="Basic"   ${b.subscription_tier === 'Basic'   ? 'selected' : ''}>Basic</option>
+                                    <option value="Premium" ${b.subscription_tier === 'Premium' ? 'selected' : ''}>Premium</option>
+                                </select>
+                            </div>
+                            <div class="edit-field">
+                                <label>Verified</label>
+                                <select id="edit-verified-${b.businessid}">
+                                    <option value="true"  ${b.is_verified  ? 'selected' : ''}>Verified</option>
+                                    <option value="false" ${!b.is_verified ? 'selected' : ''}>Unverified</option>
+                                </select>
+                            </div>
+                            <div class="edit-field">
+                                <label>Latitude</label>
+                                <input type="number" step="0.000001" id="edit-lat-${b.businessid}" value="${b.latitude || ''}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Longitude</label>
+                                <input type="number" step="0.000001" id="edit-lng-${b.businessid}" value="${b.longitude || ''}">
+                            </div>
+                        </div>
+                        <div class="edit-actions">
+                            <button class="btn btn-save" onclick="saveBusiness(${b.businessid})">Save Changes</button>
+                            <button class="btn btn-cancel" onclick="toggleEditPanel(${b.businessid})">Cancel</button>
+                        </div>
                     </div>
                 </td>
             </tr>`;
         }).join('');
     }
 
-    // ── Filter logic ──────────────────────────────────────────────
+    function toggleEditPanel(id) {
+        // Close any open panel first
+        if (openEditId && openEditId !== id) {
+            document.getElementById(`edit-row-${openEditId}`).style.display = 'none';
+        }
+        const editRow = document.getElementById(`edit-row-${id}`);
+        const isOpen  = editRow.style.display !== 'none';
+        editRow.style.display = isOpen ? 'none' : 'table-row';
+        openEditId = isOpen ? null : id;
+    }
+
+    async function saveBusiness(id) {
+        const payload = {
+            name:              document.getElementById(`edit-name-${id}`).value.trim(),
+            address:           document.getElementById(`edit-address-${id}`).value.trim(),
+            phone:             document.getElementById(`edit-phone-${id}`).value.trim() || null,
+            website:           document.getElementById(`edit-website-${id}`).value.trim() || null,
+            subscription_tier: document.getElementById(`edit-tier-${id}`).value,
+            is_verified:       document.getElementById(`edit-verified-${id}`).value === 'true',
+            latitude:          document.getElementById(`edit-lat-${id}`).value  ? parseFloat(document.getElementById(`edit-lat-${id}`).value)  : null,
+            longitude:         document.getElementById(`edit-lng-${id}`).value ? parseFloat(document.getElementById(`edit-lng-${id}`).value) : null,
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/businesses/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Request failed');
+
+            // Update local data
+            const biz = allBusinesses.find(b => b.businessid === id);
+            if (biz) Object.assign(biz, payload);
+
+            toggleEditPanel(id);
+            applyFilters();
+            showToast('Business updated successfully.');
+        } catch (e) {
+            showToast('Error saving business.', 'error');
+        }
+    }
+
     function applyFilters() {
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const tier   = document.getElementById('tierFilter').value;
+        const search   = document.getElementById('searchInput').value.toLowerCase();
+        const tier     = document.getElementById('tierFilter').value;
         const verified = document.getElementById('verifiedFilter').value;
 
         const filtered = allBusinesses.filter(b => {
             const matchSearch = !search ||
                 b.name.toLowerCase().includes(search) ||
                 (b.address || '').toLowerCase().includes(search);
-            const matchTier = !tier || b.subscription_tier === tier;
+            const matchTier     = !tier || b.subscription_tier === tier;
             const matchVerified = !verified ||
-                (verified === 'verified' && b.is_verified) ||
+                (verified === 'verified'   &&  b.is_verified) ||
                 (verified === 'unverified' && !b.is_verified);
             return matchSearch && matchTier && matchVerified;
         });
-
         renderTable(filtered);
     }
 
-    // ── Load all businesses ───────────────────────────────────────
     async function loadBusinesses() {
         try {
             const res = await fetch(`${API_URL}/businesses`);
             allBusinesses = await res.json();
-
-            // Check for ?filter=unverified from dashboard quick action
             const params = new URLSearchParams(window.location.search);
             if (params.get('filter') === 'unverified') {
                 document.getElementById('verifiedFilter').value = 'unverified';
             }
-
             applyFilters();
         } catch (e) {
             document.getElementById('businesses-tbody').innerHTML =
@@ -219,59 +311,19 @@
         }
     }
 
-    // ── Toggle verified ───────────────────────────────────────────
-    async function toggleVerified(id, newState) {
-        try {
-            const res = await fetch(`${API_URL}/businesses/${id}/verify`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ is_verified: newState })
-            });
-            if (!res.ok) throw new Error('Request failed');
-            // Update local data and re-render without a full reload
-            const biz = allBusinesses.find(b => b.businessid === id);
-            if (biz) biz.is_verified = newState;
-            applyFilters();
-            showToast(`Business ${newState ? 'verified' : 'unverified'} successfully.`);
-        } catch (e) {
-            showToast('Error updating verification status.', 'error');
-        }
-    }
-
-    // ── Toggle subscription tier ──────────────────────────────────
-    async function toggleTier(id, newTier) {
-        try {
-            const res = await fetch(`${API_URL}/businesses/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ subscription_tier: newTier })
-            });
-            if (!res.ok) throw new Error('Request failed');
-            const biz = allBusinesses.find(b => b.businessid === id);
-            if (biz) biz.subscription_tier = newTier;
-            applyFilters();
-            showToast(`Tier updated to ${newTier}.`);
-        } catch (e) {
-            showToast('Error updating subscription tier.', 'error');
-        }
-    }
-
-    // ── Delete business ───────────────────────────────────────────
     async function deleteBusiness(id, name) {
-        // First fetch deal count for this business so the warning is accurate
         let dealCount = 0;
         try {
             const dealsRes = await fetch(`${API_URL}/deals`);
             const deals = await dealsRes.json();
             dealCount = deals.filter(d => d.businessid === id).length;
-        } catch (e) { /* non-blocking — proceed with generic warning if fetch fails */ }
+        } catch (e) {}
 
         const dealWarning = dealCount > 0
             ? `\n\nThis will also permanently delete ${dealCount} associated deal${dealCount !== 1 ? 's' : ''} and all their schedules.`
             : '';
 
         if (!confirm(`Permanently delete "${name}"?${dealWarning}\n\nThis cannot be undone.`)) return;
-
         try {
             const res = await fetch(`${API_URL}/businesses/${id}`, { method: 'DELETE' });
             if (!res.ok) throw new Error('Request failed');
@@ -284,7 +336,6 @@
         }
     }
 
-    // ── Event listeners ───────────────────────────────────────────
     document.getElementById('searchInput').addEventListener('input', applyFilters);
     document.getElementById('tierFilter').addEventListener('change', applyFilters);
     document.getElementById('verifiedFilter').addEventListener('change', applyFilters);

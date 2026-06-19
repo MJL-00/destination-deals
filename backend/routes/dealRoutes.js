@@ -14,6 +14,7 @@ router.get('/:id',                                       dealController.getDealB
 
 // ── Write routes ──────────────────────────────────────────────
 router.post('/',                  dealController.createDeal);
+router.put('/:id',                dealController.updateDeal);
 router.patch('/:id/active',       dealController.toggleDealActive);
 router.delete('/:id',             dealController.deleteDeal);
 

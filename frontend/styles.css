@@ -16,7 +16,7 @@ body {
     color: #333;
 }
 
-.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; padding-top: 0; }
 
 /* ── Hero ──────────────────────────────────────────────────── */
 .hero {
@@ -459,6 +459,77 @@ select:focus, input[type="text"]:focus {
     padding: 30px;
     color: #6c757d;
 }
+
+
+/* ── Consumer nav bar ──────────────────────────────────────── */
+.consumer-nav {
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.nav-logo { display: flex; align-items: center; text-decoration: none; }
+
+.nav-logo-img {
+    height: 44px;
+    width: auto;
+    border-radius: 4px;
+    display: block;
+}
+
+.nav-links { display: flex; align-items: center; gap: 6px; }
+
+.nav-link {
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.nav-link:hover { background: #f1f3f5; color: #1a1a2e; }
+.nav-link.active { background: #e7f1ff; color: #2c6db2; }
+
+/* ── Back to top button ────────────────────────────────────── */
+.back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 10px 16px;
+    background: #2c6db2;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(44,109,178,.35);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    z-index: 300;
+    font-family: inherit;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.back-to-top:hover { background: #0056b3; }
 
 /* ── Desktop ───────────────────────────────────────────────── */
 @media (min-width: 769px) {

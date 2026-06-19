@@ -404,6 +404,63 @@ const getAllDealsEnriched = async (req, res) => {
     }
 };
 
+// ── UPDATE DEAL ──────────────────────────────────────────────
+const updateDeal = async (req, res) => {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid deal ID.' });
+
+    const {
+        title, description, discounttype, discountvalue,
+        isactive, activeDays, starttime, endtime, startdate, enddate
+    } = req.body;
+
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // Update core deal fields
+        const result = await client.query(`
+            UPDATE deal SET
+                title         = COALESCE($1, title),
+                description   = $2,
+                discounttype  = COALESCE($3, discounttype),
+                discountvalue = $4,
+                isactive      = COALESCE($5, isactive),
+                startdate     = $6,
+                enddate       = $7
+            WHERE dealid = $8
+            RETURNING *
+        `, [title, description || null, discounttype, discountvalue || null,
+            isactive, startdate || null, enddate || null, id]);
+
+        if (result.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ error: 'Deal not found.' });
+        }
+
+        // Replace schedule if days provided
+        if (activeDays && activeDays.length > 0) {
+            await client.query('DELETE FROM dealschedule WHERE dealid = $1', [id]);
+            for (const day of activeDays) {
+                await client.query(
+                    'INSERT INTO dealschedule (dealid, dayofweek, starttime, endtime) VALUES ($1, $2, $3, $4)',
+                    [id, day, starttime || null, endtime || null]
+                );
+            }
+        }
+
+        await client.query('COMMIT');
+        res.json({ message: 'Deal updated successfully.', deal: result.rows[0] });
+
+    } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Transaction Error inside updateDeal:', err);
+        res.status(500).json({ error: 'Server error updating deal.' });
+    } finally {
+        client.release();
+    }
+};
+
 // ── TOGGLE isactive FLAG ──────────────────────────────────────
 const toggleDealActive = async (req, res) => {
     const { id } = req.params;
@@ -456,6 +513,7 @@ const deleteDeal = async (req, res) => {
 // ── EXPORTS ───────────────────────────────────────────────────
 module.exports = {
     getAllDealsEnriched,
+    updateDeal,
     getDealsByDay,
     getDealsByCategory,
     getDealsByLocation,

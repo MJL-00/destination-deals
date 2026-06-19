@@ -10,7 +10,7 @@
         .topnav { background: #fff; border-bottom: 2px solid #e9ecef; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
         .topnav .brand { font-size: 18px; font-weight: 700; color: #343a40; text-decoration: none; }
         .topnav .brand span { color: #007BFF; }
-        .topnav .nav-links { display: flex; gap: 8px; }
+        .topnav .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
         .topnav .nav-links a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; color: #495057; transition: background 0.15s; }
         .topnav .nav-links a:hover { background: #f1f3f5; }
         .topnav .nav-links a.active { background: #e7f1ff; color: #007BFF; }
@@ -19,13 +19,11 @@
         .page-header h1 { margin: 0; font-size: 24px; color: #343a40; }
         .add-btn { padding: 9px 18px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; transition: background 0.2s; }
         .add-btn:hover { background: #218838; }
-
         .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
         .filter-bar input { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; width: 220px; }
         .filter-bar select { padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; }
         .filter-bar input:focus, .filter-bar select:focus { border-color: #85d7a7; outline: 0; }
         .results-count { margin-left: auto; font-size: 13px; color: #6c757d; }
-
         .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 900px; }
         thead th { background: #f8f9fa; text-align: left; padding: 10px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #6c757d; border-bottom: 2px solid #e9ecef; white-space: nowrap; }
@@ -33,19 +31,48 @@
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #f8f9fa; }
         tbody td { padding: 10px 14px; vertical-align: middle; }
-
         .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
         .badge-active   { background: #e9f7ec; color: #1e7e34; }
         .badge-inactive { background: #f1f3f5; color: #6c757d; }
-
         .actions { display: flex; gap: 6px; }
         .btn { padding: 5px 11px; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
         .btn:hover { opacity: 0.82; }
+        .btn-edit       { background: #e7f1ff; color: #0056b3; }
         .btn-activate   { background: #e9f7ec; color: #1e7e34; }
         .btn-deactivate { background: #fff3e8; color: #b25500; }
         .btn-delete     { background: #fde8e8; color: #b02a2a; }
-
+        .btn-save       { background: #28a745; color: white; padding: 7px 16px; font-size: 13px; }
+        .btn-cancel     { background: #f1f3f5; color: #495057; padding: 7px 14px; font-size: 13px; }
         .empty-row td { text-align: center; color: #adb5bd; padding: 48px; font-size: 14px; }
+
+        /* ── Inline edit panel ── */
+        .edit-row td { padding: 0 !important; border-bottom: 2px solid #28a745 !important; }
+        .edit-panel {
+            background: #f0faf2;
+            border-top: 1px solid #c3e6cb;
+            padding: 20px 24px;
+        }
+        .edit-panel h4 { margin: 0 0 16px; font-size: 14px; color: #155724; }
+        .edit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .edit-field label { display: block; font-size: 11px; font-weight: 600; color: #6c757d; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .edit-field input, .edit-field select, .edit-field textarea {
+            width: 100%; padding: 7px 10px; border: 1px solid #ced4da;
+            border-radius: 4px; font-size: 13px; background: white;
+            font-family: inherit;
+        }
+        .edit-field input:focus, .edit-field select:focus, .edit-field textarea:focus { border-color: #85d7a7; outline: 0; }
+        .edit-field textarea { resize: vertical; min-height: 60px; }
+        .edit-section-label { font-size: 11px; font-weight: 700; color: #495057; text-transform: uppercase; letter-spacing: 0.07em; margin: 14px 0 8px; padding-top: 14px; border-top: 1px solid #dee2e6; }
+        .day-checkboxes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .day-checkboxes label { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 400; cursor: pointer; }
+        .day-checkboxes input { width: auto; }
+        .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .edit-actions { display: flex; gap: 8px; margin-top: 16px; }
 
         .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
@@ -55,11 +82,13 @@
 <body>
 
 <nav class="topnav">
-    <a class="brand" href="index.html">Destination <span>Deals</span> Admin</a>
+    <a class="brand" href="admin-index.html">Destination <span>Deals</span> Admin</a>
     <div class="nav-links">
-        <a href="index.html">Dashboard</a>
+        <a href="admin-index.html">Dashboard</a>
         <a href="businesses-list.html">Businesses</a>
         <a href="deals-list.html" class="active">Deals</a>
+        <a href="add-business.html">+ Add Business</a>
+        <a href="add-deal.html">+ Add Deal</a>
     </div>
 </nav>
 
@@ -107,7 +136,9 @@
 
 <script src="../config.js"></script>
 <script>
-    let allDeals = [];
+    let allDeals   = [];
+    let openEditId = null;
+    const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
@@ -119,8 +150,8 @@
 
     function formatDiscount(d) {
         if (!d.discountvalue || d.discountvalue == 0) return d.discounttype || '—';
-        if (d.discounttype === 'Percent') return `${d.discountvalue}% off`;
-        if (d.discounttype === 'Flat')    return `$${d.discountvalue} off`;
+        if (d.discounttype === 'Percent') return `${parseFloat(d.discountvalue)}% off`;
+        if (d.discounttype === 'Flat')    return `$${parseFloat(d.discountvalue)} off`;
         return d.discounttype;
     }
 
@@ -146,27 +177,175 @@
             const statusBadge = d.isactive
                 ? '<span class="badge badge-active">Active</span>'
                 : '<span class="badge badge-inactive">Inactive</span>';
-
             const toggleBtn = d.isactive
                 ? `<button class="btn btn-deactivate" onclick="toggleActive(${d.dealid}, false)">Deactivate</button>`
-                : `<button class="btn btn-activate"   onclick="toggleActive(${d.dealid}, true)">Activate</button>`;
+                : `<button class="btn btn-activate" onclick="toggleActive(${d.dealid}, true)">Activate</button>`;
 
-            return `<tr id="deal-row-${d.dealid}">
+            // Build day checkboxes pre-checked from existing days
+            const existingDays = (d.days || '').split(', ').map(s => s.trim());
+            const dayBoxes = DAYS.map(day =>
+                `<label>
+                    <input type="checkbox" name="edit-day-${d.dealid}" value="${day}"
+                        ${existingDays.includes(day) ? 'checked' : ''}>
+                    ${day}
+                </label>`
+            ).join('');
+
+            const starttime = d.starttime ? d.starttime.slice(0,5) : '';
+            const endtime   = d.endtime   ? d.endtime.slice(0,5)   : '';
+            const startdate = d.startdate ? d.startdate.slice(0,10) : '';
+            const enddate   = d.enddate   ? d.enddate.slice(0,10)   : '';
+            const hasLTO    = !!(d.startdate || d.enddate);
+
+            return `
+            <tr id="deal-row-${d.dealid}">
                 <td>${d.dealid}</td>
                 <td><strong>${d.title}</strong></td>
                 <td>${d.business_name || '—'}</td>
                 <td>${formatDiscount(d)}</td>
-                <td style="font-size:12px; color:#6c757d;">${formatSchedule(d)}</td>
+                <td style="font-size:12px;color:#6c757d;">${formatSchedule(d)}</td>
                 <td>${(d.click_count || 0).toLocaleString()}</td>
                 <td>${statusBadge}</td>
                 <td>
                     <div class="actions">
+                        <button class="btn btn-edit" onclick="toggleEditPanel(${d.dealid})">Edit</button>
                         ${toggleBtn}
                         <button class="btn btn-delete" onclick="deleteDeal(${d.dealid}, '${d.title.replace(/'/g, "\\'")}')">Delete</button>
                     </div>
                 </td>
+            </tr>
+            <tr class="edit-row" id="edit-row-${d.dealid}" style="display:none;">
+                <td colspan="8">
+                    <div class="edit-panel">
+                        <h4>Editing: ${d.title}</h4>
+                        <div class="edit-grid">
+                            <div class="edit-field">
+                                <label>Deal Title</label>
+                                <input id="edit-title-${d.dealid}" value="${(d.title || '').replace(/"/g, '&quot;')}">
+                            </div>
+                            <div class="edit-field" style="grid-column: span 2;">
+                                <label>Description</label>
+                                <textarea id="edit-desc-${d.dealid}">${d.description || ''}</textarea>
+                            </div>
+                            <div class="edit-field">
+                                <label>Discount Type</label>
+                                <select id="edit-dtype-${d.dealid}">
+                                    <option value="Percent" ${d.discounttype === 'Percent' ? 'selected' : ''}>Percent (% Off)</option>
+                                    <option value="Flat"    ${d.discounttype === 'Flat'    ? 'selected' : ''}>Flat ($ Off)</option>
+                                    <option value="BOGO"    ${d.discounttype === 'BOGO'    ? 'selected' : ''}>BOGO</option>
+                                    <option value="Custom"  ${d.discounttype === 'Custom'  ? 'selected' : ''}>Custom</option>
+                                </select>
+                            </div>
+                            <div class="edit-field">
+                                <label>Discount Value</label>
+                                <input type="number" step="0.01" id="edit-dvalue-${d.dealid}" value="${d.discountvalue || ''}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Status</label>
+                                <select id="edit-active-${d.dealid}">
+                                    <option value="true"  ${d.isactive  ? 'selected' : ''}>Active</option>
+                                    <option value="false" ${!d.isactive ? 'selected' : ''}>Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="edit-section-label">Schedule</div>
+                        <div class="day-checkboxes" style="margin-bottom:12px;">${dayBoxes}</div>
+                        <div class="time-row">
+                            <div class="edit-field">
+                                <label>Start Time</label>
+                                <input type="time" id="edit-starttime-${d.dealid}" value="${starttime}">
+                            </div>
+                            <div class="edit-field">
+                                <label>End Time</label>
+                                <input type="time" id="edit-endtime-${d.dealid}" value="${endtime}">
+                            </div>
+                        </div>
+
+                        <div class="edit-section-label">Limited Time Offer</div>
+                        <div class="time-row">
+                            <div class="edit-field">
+                                <label>Go Live Date</label>
+                                <input type="date" id="edit-startdate-${d.dealid}" value="${startdate}">
+                            </div>
+                            <div class="edit-field">
+                                <label>Expiry Date</label>
+                                <input type="date" id="edit-enddate-${d.dealid}" value="${enddate}">
+                            </div>
+                        </div>
+
+                        <div class="edit-actions">
+                            <button class="btn btn-save" onclick="saveDeal(${d.dealid})">Save Changes</button>
+                            <button class="btn btn-cancel" onclick="toggleEditPanel(${d.dealid})">Cancel</button>
+                        </div>
+                    </div>
+                </td>
             </tr>`;
         }).join('');
+    }
+
+    function toggleEditPanel(id) {
+        if (openEditId && openEditId !== id) {
+            document.getElementById(`edit-row-${openEditId}`).style.display = 'none';
+        }
+        const editRow = document.getElementById(`edit-row-${id}`);
+        const isOpen  = editRow.style.display !== 'none';
+        editRow.style.display = isOpen ? 'none' : 'table-row';
+        openEditId = isOpen ? null : id;
+    }
+
+    async function saveDeal(id) {
+        const checkedDays = [...document.querySelectorAll(`input[name="edit-day-${id}"]:checked`)]
+            .map(cb => cb.value);
+
+        if (checkedDays.length === 0) {
+            showToast('Please select at least one active day.', 'error');
+            return;
+        }
+
+        const payload = {
+            title:         document.getElementById(`edit-title-${id}`).value.trim(),
+            description:   document.getElementById(`edit-desc-${id}`).value.trim() || null,
+            discounttype:  document.getElementById(`edit-dtype-${id}`).value,
+            discountvalue: document.getElementById(`edit-dvalue-${id}`).value
+                ? parseFloat(document.getElementById(`edit-dvalue-${id}`).value) : null,
+            isactive:      document.getElementById(`edit-active-${id}`).value === 'true',
+            activeDays:    checkedDays,
+            starttime:     document.getElementById(`edit-starttime-${id}`).value || null,
+            endtime:       document.getElementById(`edit-endtime-${id}`).value   || null,
+            startdate:     document.getElementById(`edit-startdate-${id}`).value || null,
+            enddate:       document.getElementById(`edit-enddate-${id}`).value   || null,
+        };
+
+        try {
+            const res = await fetch(`${API_URL}/deals/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Request failed');
+
+            // Update local data
+            const deal = allDeals.find(d => d.dealid === id);
+            if (deal) Object.assign(deal, {
+                title:         payload.title,
+                description:   payload.description,
+                discounttype:  payload.discounttype,
+                discountvalue: payload.discountvalue,
+                isactive:      payload.isactive,
+                days:          checkedDays.join(', '),
+                starttime:     payload.starttime,
+                endtime:       payload.endtime,
+                startdate:     payload.startdate,
+                enddate:       payload.enddate,
+            });
+
+            toggleEditPanel(id);
+            applyFilters();
+            showToast('Deal updated successfully.');
+        } catch (e) {
+            showToast('Error saving deal.', 'error');
+        }
     }
 
     function applyFilters() {
@@ -181,11 +360,9 @@
             const matchStatus = !status ||
                 (status === 'active'   &&  d.isactive) ||
                 (status === 'inactive' && !d.isactive);
-            const matchCat = !category ||
-                (d.categories || '').includes(category);
+            const matchCat = !category || (d.categories || '').includes(category);
             return matchSearch && matchStatus && matchCat;
         });
-
         renderTable(filtered);
     }
 
@@ -194,7 +371,6 @@
             const res = await fetch(`${API_URL}/deals`);
             allDeals = await res.json();
 
-            // Populate category filter dynamically from live data
             const catSet = new Set();
             allDeals.forEach(d => {
                 if (d.categories) d.categories.split(', ').forEach(c => catSet.add(c.trim()));
@@ -202,17 +378,14 @@
             const catSelect = document.getElementById('categoryFilter');
             [...catSet].sort().forEach(cat => {
                 const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
+                opt.value = cat; opt.textContent = cat;
                 catSelect.appendChild(opt);
             });
 
-            // Check for ?filter=inactive from dashboard quick action
             const params = new URLSearchParams(window.location.search);
             if (params.get('filter') === 'inactive') {
                 document.getElementById('statusFilter').value = 'inactive';
             }
-
             applyFilters();
         } catch (e) {
             document.getElementById('deals-tbody').innerHTML =

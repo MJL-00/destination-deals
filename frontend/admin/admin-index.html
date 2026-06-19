@@ -10,7 +10,7 @@
         .topnav { background: #fff; border-bottom: 2px solid #e9ecef; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
         .topnav .brand { font-size: 18px; font-weight: 700; color: #343a40; text-decoration: none; }
         .topnav .brand span { color: #007BFF; }
-        .topnav .nav-links { display: flex; gap: 8px; }
+        .topnav .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
         .topnav .nav-links a { padding: 6px 14px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: 600; color: #495057; transition: background 0.15s; }
         .topnav .nav-links a:hover { background: #f1f3f5; }
         .topnav .nav-links a.active { background: #e7f1ff; color: #007BFF; }
@@ -62,11 +62,13 @@
 <body>
 
 <nav class="topnav">
-    <a class="brand" href="index.html">Destination <span>Deals</span> Admin</a>
+    <a class="brand" href="admin-index.html">Destination <span>Deals</span> Admin</a>
     <div class="nav-links">
-        <a href="index.html" class="active">Dashboard</a>
+        <a href="admin-index.html" class="active">Dashboard</a>
         <a href="businesses-list.html">Businesses</a>
         <a href="deals-list.html">Deals</a>
+        <a href="add-business.html">+ Add Business</a>
+        <a href="add-deal.html">+ Add Deal</a>
     </div>
 </nav>
 
@@ -212,15 +214,17 @@
                 return;
             }
             tbody.innerHTML = [...deals].sort((a, b) => b.dealid - a.dealid).slice(0, 8).map(d => {
-                const discount = d.discountvalue
-                    ? (d.discounttype === 'Percent' ? `${d.discountvalue}% off` : `$${d.discountvalue} off`)
+                const discount = (d.discountvalue && d.discountvalue > 0)
+                    ? (d.discounttype === 'Percent'
+                        ? `${parseFloat(d.discountvalue)}% off`
+                        : `$${parseFloat(d.discountvalue)} off`)
                     : d.discounttype || '—';
                 const statusBadge = d.isactive
                     ? '<span class="badge badge-active">Active</span>'
                     : '<span class="badge badge-inactive">Inactive</span>';
                 return `<tr>
                     <td>${d.title}</td>
-                    <td>${d.name || d.businessid}</td>
+                    <td>${d.business_name || d.name || '—'}</td>
                     <td>${discount}</td>
                     <td>${(d.click_count || 0).toLocaleString()}</td>
                     <td>${(d.redemption_count || 0).toLocaleString()}</td>
