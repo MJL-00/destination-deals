@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="auth-guard.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - All Businesses</title>
@@ -70,6 +71,53 @@
         .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .toast.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* ── Hamburger nav (< 950px) ── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            border: none;
+            background: none;
+        }
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #343a40;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+            padding: 8px 20px 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a {
+            padding: 10px 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .mobile-nav a:last-child { border-bottom: none; }
+        .mobile-nav a.active { color: #007BFF; }
+        .mobile-nav a:hover { color: #1a1a2e; }
+
+        @media (max-width: 950px) {
+            .topnav .nav-links { display: none; }
+            .hamburger { display: flex; }
+        }
+        @media (min-width: 951px) {
+            .mobile-nav { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -83,8 +131,23 @@
         <a href="add-business.html">+ Add Business</a>
         <a href="add-deal.html">+ Add Deal</a>
         <a href="crm.html">CRM</a>
+        <a href="reports.html">Reports</a>
+        <button onclick="adminLogout()" style="padding:6px 14px; border-radius:4px; border:1px solid #dee2e6; background:white; font-size:14px; font-weight:600; color:#6c757d; cursor:pointer; margin-left:6px;">Logout</button>
     </div>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
 </nav>
+
+<div class="mobile-nav" id="mobileNav">
+    <a href="admin-index.html">Dashboard</a>
+        <a href="businesses-list.html" class="active">Businesses</a>
+        <a href="deals-list.html">Deals</a>
+        <a href="add-business.html">+ Add Business</a>
+        <a href="add-deal.html">+ Add Deal</a>
+        <a href="crm.html">CRM</a>
+        <a href="reports.html">Reports</a>
+</div>
 
 <div class="page">
     <div class="page-header">
@@ -372,6 +435,20 @@
     document.getElementById('verifiedFilter').addEventListener('change', applyFilters);
 
     loadBusinesses();
+</script>
+
+<script>
+    document.getElementById('hamburgerBtn').addEventListener('click', function() {
+        document.getElementById('mobileNav').classList.toggle('open');
+    });
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        const nav = document.getElementById('mobileNav');
+        const btn = document.getElementById('hamburgerBtn');
+        if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+            nav.classList.remove('open');
+        }
+    });
 </script>
 </body>
 </html>

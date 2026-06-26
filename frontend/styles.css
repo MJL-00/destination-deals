@@ -549,6 +549,47 @@ select:focus, input[type="text"]:focus {
 }
 
 
+
+/* ── Alphabet jump bar ─────────────────────────────────────── */
+.alphabet-bar {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 8px 2px;
+    margin-bottom: 12px;
+    scroll-snap-type: x mandatory;
+}
+.alphabet-bar::-webkit-scrollbar { display: none; }
+
+.alpha-btn {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    scroll-snap-align: start;
+    transition: background 0.12s, color 0.12s;
+}
+
+.alpha-btn.active {
+    background: #2c6db2;
+    color: white;
+}
+.alpha-btn.active:hover {
+    background: #0056b3;
+}
+.alpha-btn.inactive {
+    background: #f1f3f5;
+    color: #ced4da;
+    cursor: default;
+}
+
 /* ── Consumer nav bar ──────────────────────────────────────── */
 .consumer-nav {
     background: rgba(255,255,255,.96);

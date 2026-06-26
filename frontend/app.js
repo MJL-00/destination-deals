@@ -9,6 +9,17 @@ let userLng         = null;
 let locationGranted = false;
 let dealsLoaded     = false;
 
+// ── Device ID (persistent per browser for page view tracking) ─
+function getDeviceId() {
+    let id = localStorage.getItem('dd_device_id');
+    if (!id) {
+        id = 'dev_' + Math.random().toString(36).slice(2) +
+             Math.random().toString(36).slice(2);
+        localStorage.setItem('dd_device_id', id);
+    }
+    return id;
+}
+
 // ── DOM refs ─────────────────────────────────────────────────
 const locationSelect = document.getElementById('locationSelect');
 const categorySelect = document.getElementById('categorySelect');
@@ -42,26 +53,34 @@ function haversine(lat1, lng1, lat2, lng2) {
 
 // ── Location permission flow ──────────────────────────────────
 function requestLocation() {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+        // No geolocation support — reset sort and hide banner
+        sortSelect.value = 'default';
+        locationBanner.style.display = 'none';
+        return;
+    }
     navigator.geolocation.getCurrentPosition(
         pos => {
             userLat = pos.coords.latitude;
             userLng = pos.coords.longitude;
             locationGranted = true;
             locationBanner.style.display = 'none';
-            // Only re-sort if deals are already loaded
             if (dealsLoaded) {
                 sortSelect.value = 'nearest';
                 applyFilters();
             }
         },
-        () => { locationBanner.style.display = 'none'; }
+        () => {
+            // Denied or unavailable — reset sort, show message in banner
+            sortSelect.value = 'default';
+            locationBanner.style.display = 'none';
+            if (dealsLoaded) applyFilters();
+        }
     );
 }
 
 allowBtn.addEventListener('click', () => {
-    locationBanner.style.display = 'none';
-    requestLocation();
+    requestLocation(); // banner hides in success callback once location confirmed
 });
 dismissBtn.addEventListener('click', () => {
     locationBanner.style.display = 'none';
@@ -119,6 +138,14 @@ async function loadDealsForCity(city) {
         allDeals    = await res.json();
         dealsLoaded = true;
 
+        // Log page view — fire and forget, never blocks UI
+        const state = cityStateMap[city.toLowerCase()] || null;
+        fetch(`${API_URL}/pageviews/city`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ city, state, device_id: getDeviceId() })
+        }).catch(() => {});
+
         applyFilters();
     } catch (e) {
         results.innerHTML = '<div class="welcome-card"><p>Could not load deals. Please try again.</p></div>';
@@ -131,13 +158,7 @@ function showWelcomeState() {
     allDeals    = [];
     dealsLoaded = false;
     resultsHeader.style.display = 'none';
-    results.innerHTML = `
-        <div class="welcome-card">
-            <p>Select a location above to see local deals near you.</p>
-            <p style="margin-top: 10px; font-size: 13px; color: #adb5bd;">
-                Visiting a new area? Scan a local QR code to load deals instantly.
-            </p>
-        </div>`;
+    results.innerHTML = '';
 }
 
 // ── Autocomplete ──────────────────────────────────────────────
@@ -199,10 +220,11 @@ locationSelect.addEventListener('change', () => {
     const state = cityStateMap[city.toLowerCase()];
     if (state) setBackgroundForState(state);
 
-    // Reset secondary filters when switching cities
+    // Reset secondary filters AND sort when switching cities
     categorySelect.value = '';
     daySelect.value      = '';
     searchInput.value    = '';
+    sortSelect.value     = 'default';
     loadDealsForCity(city);
 });
 
@@ -239,15 +261,25 @@ function applyFilters() {
             : null
     }));
 
-    // Sort
-    if (sort === 'nearest' && locationGranted) {
-        filtered.sort((a, b) => (a.distance ?? 9999) - (b.distance ?? 9999));
-    } else if (sort === 'az') {
-        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    // Sort — nearest only alternative, Featured is default tiered random
+    if (sort === 'nearest') {
+        if (locationGranted) {
+            filtered.sort((a, b) => (a.distance ?? 9999) - (b.distance ?? 9999));
+        }
     }
 
-    displayDeals(filtered);
+    const grouped = groupByBusiness(filtered);
+    displayDeals(filtered, grouped);
     updateFilterTags();
+}
+
+// ── Fisher-Yates shuffle ─────────────────────────────────────
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
 }
 
 // ── Group deals by business name ──────────────────────────────
@@ -257,27 +289,36 @@ function groupByBusiness(deals) {
         const key = deal.name;
         if (!map.has(key)) {
             map.set(key, {
-                name:           deal.name,
-                businessid:     deal.businessid,
-                address:        deal.address,
-                city:           deal.city,
-                state:          deal.state,
-                phone:          deal.phone,
-                website:        deal.website,
-                latitude:       deal.latitude,
-                longitude:      deal.longitude,
-                distance:       deal.distance,
-                outdoor_dining: deal.outdoor_dining || false,
-                live_music:     deal.live_music     || false,
-                waterfront:     deal.waterfront     || false,
-                pet_friendly:   deal.pet_friendly   || false,
-                deals:          []
+                name:              deal.name,
+                businessid:        deal.businessid,
+                subscription_tier: deal.subscription_tier || 'Basic',
+                address:           deal.address,
+                city:              deal.city,
+                state:             deal.state,
+                phone:             deal.phone,
+                website:           deal.website,
+                latitude:          deal.latitude,
+                longitude:         deal.longitude,
+                distance:          deal.distance,
+                outdoor_dining:    deal.outdoor_dining || false,
+                live_music:        deal.live_music     || false,
+                waterfront:        deal.waterfront     || false,
+                pet_friendly:      deal.pet_friendly   || false,
+                deals:             []
             });
         }
         map.get(key).deals.push(deal);
     });
-    return [...map.values()];
+
+    const businesses = [...map.values()];
+
+    // Featured sort: split into tier groups, shuffle each independently, rejoin
+    const premium = shuffleArray(businesses.filter(b => b.subscription_tier === 'Premium'));
+    const basic   = shuffleArray(businesses.filter(b => b.subscription_tier !== 'Premium'));
+
+    return [...premium, ...basic];
 }
+
 
 // ── Filter tag pills ──────────────────────────────────────────
 function updateFilterTags() {
@@ -348,8 +389,8 @@ function formatDays(dayString) {
 }
 
 // ── Display ───────────────────────────────────────────────────
-function displayDeals(deals) {
-    const grouped = groupByBusiness(deals);
+function displayDeals(deals, grouped) {
+    if (!grouped) grouped = groupByBusiness(deals);
 
     dealCount.textContent =
         `Showing ${grouped.length} business${grouped.length !== 1 ? 'es' : ''}` +
@@ -445,14 +486,20 @@ function displayDeals(deals) {
 // ── Click tracking (fire and forget) ─────────────────────────
 function trackWebsiteClick(e, businessId) {
     if (!businessId) return;
-    fetch(`${API_URL}/businesses/${businessId}/website-click`, { method: 'POST' })
-        .catch(() => {});
+    fetch(`${API_URL}/businesses/${businessId}/website-click`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: getDeviceId() })
+    }).catch(() => {});
 }
 
 function trackDirectionsClick(e, businessId) {
     if (!businessId) return;
-    fetch(`${API_URL}/businesses/${businessId}/directions-click`, { method: 'POST' })
-        .catch(() => {});
+    fetch(`${API_URL}/businesses/${businessId}/directions-click`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id: getDeviceId() })
+    }).catch(() => {});
 }
 
 // ── Amenity legend popup (mobile tap) ────────────────────────
@@ -512,10 +559,7 @@ function checkUrlParams() {
     if (match) {
         locationSelect.value = match.value;
         loadDealsForCity(match.value);
-        // Show banner after load since user came via QR
-        setTimeout(() => {
-            if (!locationGranted) locationBanner.style.display = 'flex';
-        }, 1200);
+        // QR code load — no location banner shown automatically
         return true;
     }
     return false;
@@ -524,7 +568,28 @@ function checkUrlParams() {
 // ── Secondary filter listeners ────────────────────────────────
 categorySelect.addEventListener('change', applyFilters);
 daySelect.addEventListener('change', applyFilters);
-sortSelect.addEventListener('change', applyFilters);
+sortSelect.addEventListener('change', () => {
+    if (sortSelect.value === 'nearest' && !locationGranted) {
+        // Check if permission already granted — if so, get location silently
+        if (navigator.permissions) {
+            navigator.permissions.query({ name: 'geolocation' }).then(result => {
+                if (result.state === 'granted') {
+                    // Already allowed — get location silently, no banner
+                    requestLocation();
+                } else {
+                    // Prompt or denied — show banner so user understands why
+                    locationBanner.style.display = 'flex';
+                    requestLocation();
+                }
+            });
+        } else {
+            // Fallback for browsers without permissions API
+            locationBanner.style.display = 'flex';
+            requestLocation();
+        }
+    }
+    applyFilters();
+});
 
 // ── Init ──────────────────────────────────────────────────────
 Promise.all([loadLocations(), loadCategories()])
@@ -534,9 +599,6 @@ Promise.all([loadLocations(), loadCategories()])
         // Otherwise show welcome state
         if (!loadedFromUrl) {
             showWelcomeState();
-            // Still ask for location so distance is ready when they pick a city
-            setTimeout(() => {
-                if (!locationGranted) locationBanner.style.display = 'flex';
-            }, 800);
+            // Location banner only shown when user selects Closest to Me
         }
     });

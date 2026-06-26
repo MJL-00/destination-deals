@@ -31,7 +31,8 @@
             onclick="resetHome()"
             style="cursor:pointer;">
         <p class="tagline">
-            Discover local savings, activities, shopping, and dining.
+            Select a location below to discover local deals near you.<br>
+            <span style="font-size:0.88rem; color:#adb5bd;">Visiting a new area? Scan a local QR code to load deals instantly.</span>
         </p>
     </div>
 
@@ -85,9 +86,8 @@
         <div class="filter-group sort-group">
             <label>Sort by</label>
             <select id="sortSelect">
-                <option value="default">Default</option>
-                <option value="nearest">Nearest First</option>
-                <option value="az">A → Z</option>
+                <option value="default">Featured</option>
+                <option value="nearest">Closest to Me</option>
             </select>
         </div>
     </div>
@@ -101,14 +101,7 @@
     </div>
 
     <!-- Deal cards -->
-    <div id="results">
-        <div class="welcome-card">
-            <p>Select a location above to see local deals near you.</p>
-            <p style="margin-top: 10px; font-size: 13px; color: #adb5bd;">
-                Visiting a new area? Scan a local QR code to load deals instantly.
-            </p>
-        </div>
-    </div>
+    <div id="results"></div>
 
 </div>
 

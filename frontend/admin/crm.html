@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="auth-guard.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - CRM Prospects</title>
@@ -125,7 +126,7 @@
         .note-add textarea:focus { border-color: #80bdff; outline: 0; }
         .btn-note-save { background: #007BFF; color: white; border: none; border-radius: 4px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; align-self: flex-end; }
         .btn-note-save:hover { background: #0056b3; }
-        .latest-note { font-size: 12px; color: #6c757d; font-style: italic; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .latest-note { font-size: 12px; color: #6c757d; font-style: italic; max-width: 180px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .no-notes { font-size: 12px; color: #adb5bd; }
 
         /* Follow-up date */
@@ -155,6 +156,53 @@
         .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 6px; font-size: 14px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .toast.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .toast.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* ── Hamburger nav (< 950px) ── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 6px;
+            border: none;
+            background: none;
+        }
+        .hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #343a40;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .mobile-nav {
+            display: none;
+            flex-direction: column;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+            padding: 8px 20px 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+        .mobile-nav.open { display: flex; }
+        .mobile-nav a {
+            padding: 10px 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .mobile-nav a:last-child { border-bottom: none; }
+        .mobile-nav a.active { color: #007BFF; }
+        .mobile-nav a:hover { color: #1a1a2e; }
+
+        @media (max-width: 950px) {
+            .topnav .nav-links { display: none; }
+            .hamburger { display: flex; }
+        }
+        @media (min-width: 951px) {
+            .mobile-nav { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -169,7 +217,19 @@
         <a href="add-deal.html">+ Add Deal</a>
         <a href="crm.html" class="active">CRM</a>
     </div>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
 </nav>
+
+<div class="mobile-nav" id="mobileNav">
+    <a href="admin-index.html">Dashboard</a>
+        <a href="businesses-list.html">Businesses</a>
+        <a href="deals-list.html">Deals</a>
+        <a href="add-business.html">+ Add Business</a>
+        <a href="add-deal.html">+ Add Deal</a>
+        <a href="crm.html" class="active">CRM</a>
+</div>
 
 <div class="page">
     <div class="page-header">
@@ -774,6 +834,20 @@
 
     loadLocationDropdown();
     loadProspects();
+</script>
+
+<script>
+    document.getElementById('hamburgerBtn').addEventListener('click', function() {
+        document.getElementById('mobileNav').classList.toggle('open');
+    });
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        const nav = document.getElementById('mobileNav');
+        const btn = document.getElementById('hamburgerBtn');
+        if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+            nav.classList.remove('open');
+        }
+    });
 </script>
 </body>
 </html>

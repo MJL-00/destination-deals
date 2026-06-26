@@ -13,6 +13,7 @@ const getDealsByDay = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining,
                 Business.live_music,
                 Business.waterfront,
@@ -34,6 +35,7 @@ const getDealsByDay = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining, Business.live_music,
                 Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
@@ -59,6 +61,7 @@ const getDealsByCategory = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining,
                 Business.live_music,
                 Business.waterfront,
@@ -76,6 +79,7 @@ const getDealsByCategory = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining, Business.live_music,
                 Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue
@@ -100,6 +104,7 @@ const getDealsByLocation = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining,
                 Business.live_music,
                 Business.waterfront,
@@ -133,12 +138,18 @@ const getDealsByLocation = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining, Business.live_music,
                 Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 Deal.startdate, Deal.enddate,
                 Location.City, Location.State
-            ORDER BY Business.Name
+            ORDER BY
+                CASE Business.subscription_tier
+                    WHEN 'Premium' THEN 1
+                    ELSE 2
+                END,
+                Business.Name
         `, [city]);
         res.json(result.rows);
     } catch (err) {
@@ -161,6 +172,7 @@ const getDealsByLocationAndCategory = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining,
                 Business.live_music,
                 Business.waterfront,
@@ -195,12 +207,18 @@ const getDealsByLocationAndCategory = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining, Business.live_music,
                 Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 Deal.startdate, Deal.enddate,
                 Location.City, Location.State
-            ORDER BY Business.Name
+            ORDER BY
+                CASE Business.subscription_tier
+                    WHEN 'Premium' THEN 1
+                    ELSE 2
+                END,
+                Business.Name
         `, [city, category]);
         res.json(result.rows);
     } catch (err) {
@@ -223,6 +241,7 @@ const getDealsByLocationAndDay = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining,
                 Business.live_music,
                 Business.waterfront,
@@ -251,12 +270,18 @@ const getDealsByLocationAndDay = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining, Business.live_music,
                 Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 DealSchedule.DayOfWeek, DealSchedule.StartTime, DealSchedule.EndTime,
                 Location.City, Location.State
-            ORDER BY Business.Name
+            ORDER BY
+                CASE Business.subscription_tier
+                    WHEN 'Premium' THEN 1
+                    ELSE 2
+                END,
+                Business.Name
         `, [city, day]);
         res.json(result.rows);
     } catch (err) {
@@ -280,6 +305,7 @@ const getDealsByLocationCategoryAndDay = async (req, res) => {
                 Business.Website,
                 Business.latitude,
                 Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining,
                 Business.live_music,
                 Business.waterfront,
@@ -309,13 +335,19 @@ const getDealsByLocationCategoryAndDay = async (req, res) => {
             GROUP BY
                 Business.BusinessID, Business.Name, Business.Address, Business.Phone,
                 Business.Website, Business.latitude, Business.longitude,
+                Business.subscription_tier,
                 Business.outdoor_dining, Business.live_music,
                 Business.waterfront, Business.pet_friendly,
                 Deal.Title, Deal.Description, Deal.DiscountType, Deal.DiscountValue,
                 Deal.startdate, Deal.enddate,
                 Location.City, Location.State,
                 DealSchedule.DayOfWeek, DealSchedule.StartTime, DealSchedule.EndTime
-            ORDER BY Business.Name
+            ORDER BY
+                CASE Business.subscription_tier
+                    WHEN 'Premium' THEN 1
+                    ELSE 2
+                END,
+                Business.Name
         `, [city, category, day]);
         res.json(result.rows);
     } catch (err) {

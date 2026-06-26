@@ -7,8 +7,14 @@ const businessRoutes = require('./routes/businessRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const prospectRoutes = require('./routes/prospectRoutes');
+const authRoutes = require('./routes/authRoutes');
+const pageViewRoutes = require('./routes/pageViewRoutes');
 
 const pool = require('./db'); // Tells server.js what "pool" means!
+
+
+
+
 
 
 
@@ -27,6 +33,8 @@ app.use('/businesses', businessRoutes);
 app.use('/locations', locationRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/prospects', prospectRoutes);
+app.use('/auth', authRoutes);
+app.use('/pageviews', pageViewRoutes);
 
 
 app.get('/dbcheck', async (req, res) => {

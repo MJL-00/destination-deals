@@ -194,6 +194,7 @@ const verifyBusiness = async (req, res) => {
 // ── INCREMENT WEBSITE CLICK COUNT ─────────────────────────────
 const incrementWebsiteClick = async (req, res) => {
     const { id } = req.params;
+    const { device_id } = req.body;
     try {
         const result = await pool.query(
             'UPDATE business SET website_click_count = website_click_count + 1 WHERE businessid = $1 RETURNING businessid, name, website_click_count',
@@ -202,6 +203,12 @@ const incrementWebsiteClick = async (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Business not found.' });
         }
+        // Log timestamped click for reporting (non-blocking)
+        pool.query(
+            'INSERT INTO business_click (businessid, click_type, device_id) VALUES ($1, $2, $3)',
+            [id, 'website', device_id || null]
+        ).catch(err => console.error('business_click insert error:', err));
+
         res.json({ success: true, website_click_count: result.rows[0].website_click_count });
     } catch (err) {
         console.error(err);
@@ -212,6 +219,7 @@ const incrementWebsiteClick = async (req, res) => {
 // ── INCREMENT DIRECTIONS CLICK COUNT ─────────────────────────
 const incrementDirectionsClick = async (req, res) => {
     const { id } = req.params;
+    const { device_id } = req.body;
     try {
         const result = await pool.query(
             'UPDATE business SET directions_click_count = directions_click_count + 1 WHERE businessid = $1 RETURNING businessid, name, directions_click_count',
@@ -220,6 +228,12 @@ const incrementDirectionsClick = async (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Business not found.' });
         }
+        // Log timestamped click for reporting (non-blocking)
+        pool.query(
+            'INSERT INTO business_click (businessid, click_type, device_id) VALUES ($1, $2, $3)',
+            [id, 'directions', device_id || null]
+        ).catch(err => console.error('business_click insert error:', err));
+
         res.json({ success: true, directions_click_count: result.rows[0].directions_click_count });
     } catch (err) {
         console.error(err);
