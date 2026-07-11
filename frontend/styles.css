@@ -5,12 +5,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    background:
-        linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)),
-        url('images/default_background.png');
-    background-size: 450px;
-    background-repeat: repeat;
-    background-attachment: fixed;
+    background-color: #e8e8e8;
     padding: 20px;
     font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
     color: #333;
@@ -590,9 +585,28 @@ select:focus, input[type="text"]:focus {
     cursor: default;
 }
 
+
+/* ── Full page background (cross-browser) ─────────────────── */
+#bgLayer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -2;
+    background-image: url('images/default_background.png');
+    background-size: 450px 450px;
+    background-repeat: repeat;
+}
+#bgOverlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    background-color: rgba(255,255,255,0.78);
+}
+
 /* ── Consumer nav bar ──────────────────────────────────────── */
 .consumer-nav {
-    background: rgba(255,255,255,.96);
+    background: rgba(255,255,255,0.97);
     border-bottom: 1px solid rgba(0,0,0,.08);
     padding: 0 24px;
     display: flex;
@@ -692,4 +706,10 @@ select:focus, input[type="text"]:focus {
 @media (max-width: 400px) {
     .hero-logo-img { width: 95%; }
     .tagline       { font-size: 0.95rem; }
+}
+
+/* ── Edge browser fallback ─────────────────────────────────── */
+@supports (-ms-ime-align: auto) {
+    body { background: #f0ece4 !important; }
+    #bgLayer, #bgOverlay { display: none !important; }
 }

@@ -424,7 +424,15 @@ const getDealById = async (req, res) => {
                 b.name AS business_name,
                 STRING_AGG(DISTINCT c.categoryname, ', ') AS categories,
                 STRING_AGG(DISTINCT ds.dayofweek, ', '
-                    ORDER BY ds.dayofweek) AS days,
+                    ORDER BY CASE ds.dayofweek
+                        WHEN 'Monday'    THEN 1
+                        WHEN 'Tuesday'   THEN 2
+                        WHEN 'Wednesday' THEN 3
+                        WHEN 'Thursday'  THEN 4
+                        WHEN 'Friday'    THEN 5
+                        WHEN 'Saturday'  THEN 6
+                        WHEN 'Sunday'    THEN 7
+                    END) AS days,
                 MIN(ds.starttime) AS starttime,
                 MAX(ds.endtime)   AS endtime
             FROM deal d
@@ -452,17 +460,29 @@ const getAllDealsEnriched = async (req, res) => {
             SELECT
                 d.*,
                 b.name AS business_name,
+                l.city,
+                l.state,
                 STRING_AGG(DISTINCT c.categoryname, ', ') AS categories,
                 STRING_AGG(DISTINCT ds.dayofweek, ', '
-                    ORDER BY ds.dayofweek) AS days,
+                    ORDER BY CASE ds.dayofweek
+                        WHEN 'Monday'    THEN 1
+                        WHEN 'Tuesday'   THEN 2
+                        WHEN 'Wednesday' THEN 3
+                        WHEN 'Thursday'  THEN 4
+                        WHEN 'Friday'    THEN 5
+                        WHEN 'Saturday'  THEN 6
+                        WHEN 'Sunday'    THEN 7
+                    END) AS days,
                 MIN(ds.starttime) AS starttime,
                 MAX(ds.endtime)   AS endtime
             FROM deal d
-            JOIN business b        ON d.businessid  = b.businessid
-            LEFT JOIN dealcategory dc ON d.dealid   = dc.dealid
-            LEFT JOIN category     c  ON dc.categoryid = c.categoryid
-            LEFT JOIN dealschedule ds ON d.dealid   = ds.dealid
-            GROUP BY d.dealid, b.name
+            JOIN business b           ON d.businessid    = b.businessid
+            LEFT JOIN businesslocation bl ON b.businessid = bl.businessid
+            LEFT JOIN location l          ON bl.locationid = l.locationid
+            LEFT JOIN dealcategory dc  ON d.dealid        = dc.dealid
+            LEFT JOIN category c       ON dc.categoryid   = c.categoryid
+            LEFT JOIN dealschedule ds  ON d.dealid        = ds.dealid
+            GROUP BY d.dealid, b.name, l.city, l.state
             ORDER BY d.dealid DESC
         `);
         res.json(result.rows);

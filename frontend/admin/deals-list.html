@@ -289,7 +289,7 @@
                 <td>${d.dealid}</td>
                 <td><strong>${d.title}</strong></td>
                 <td>${d.business_name || '—'}</td>
-                <td style="font-size:12px;color:#6c757d;">${d.city && d.state ? `${d.city}, ${d.state}` : '—'}</td>
+                <td style="font-size:12px;color:#6c757d;white-space:nowrap;">${d.city && d.state ? `${d.city}, ${d.state}` : d.city || '—'}</td>
                 <td>${formatDiscount(d)}</td>
                 <td style="font-size:12px;color:#6c757d;line-height:1.6;">${formatSchedule(d)}</td>
                 <td>${(d.click_count || 0).toLocaleString()}</td>

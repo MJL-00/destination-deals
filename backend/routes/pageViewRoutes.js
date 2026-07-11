@@ -55,35 +55,33 @@ router.get('/monthly', async (req, res) => {
     }
 
     try {
-        const result = await pool.query(`
-            SELECT
-                COUNT(DISTINCT device_id) AS unique_devices,
-                COUNT(DISTINCT ip_hash)   AS unique_ips,
-                DATE_TRUNC('week', viewed_at) AS week_start,
-                COUNT(DISTINCT device_id) AS weekly_devices
-            FROM page_view
-            WHERE city = $1
-              AND EXTRACT(YEAR  FROM viewed_at) = $2
-              AND EXTRACT(MONTH FROM viewed_at) = $3
-            GROUP BY DATE_TRUNC('week', viewed_at)
-            ORDER BY week_start
-        `, [city, parseInt(year), parseInt(month)]);
-
-        // Also get total
-        const total = await pool.query(`
-            SELECT COUNT(DISTINCT device_id) AS total_devices
-            FROM page_view
-            WHERE city = $1
-              AND EXTRACT(YEAR  FROM viewed_at) = $2
-              AND EXTRACT(MONTH FROM viewed_at) = $3
-        `, [city, parseInt(year), parseInt(month)]);
+        const [weeklyResult, totalResult] = await Promise.all([
+            pool.query(`
+                SELECT
+                    DATE_TRUNC('week', viewed_at) AS week_start,
+                    COUNT(DISTINCT device_id)     AS weekly_devices
+                FROM page_view
+                WHERE city = $1
+                  AND EXTRACT(YEAR  FROM viewed_at) = $2
+                  AND EXTRACT(MONTH FROM viewed_at) = $3
+                GROUP BY DATE_TRUNC('week', viewed_at)
+                ORDER BY week_start
+            `, [city, parseInt(year), parseInt(month)]),
+            pool.query(`
+                SELECT COUNT(DISTINCT device_id) AS total_devices
+                FROM page_view
+                WHERE city = $1
+                  AND EXTRACT(YEAR  FROM viewed_at) = $2
+                  AND EXTRACT(MONTH FROM viewed_at) = $3
+            `, [city, parseInt(year), parseInt(month)])
+        ]);
 
         res.json({
             city,
-            year:           parseInt(year),
-            month:          parseInt(month),
-            total_devices:  parseInt(total.rows[0]?.total_devices || 0),
-            weekly:         result.rows
+            year:          parseInt(year),
+            month:         parseInt(month),
+            total_devices: parseInt(totalResult.rows[0]?.total_devices || 0),
+            weekly:        weeklyResult.rows
         });
     } catch (err) {
         console.error('pageview monthly error:', err);

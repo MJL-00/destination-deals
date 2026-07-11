@@ -239,6 +239,28 @@
     let selectedBizId = null;
     let reportData    = {};
 
+    function formatTime(t) {
+        if (!t) return '';
+        const [h, m] = t.split(':').map(Number);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const hour = h % 12 || 12;
+        return `${hour}:${String(m).padStart(2,'0')} ${ampm}`;
+    }
+
+    function formatDays(dayStr) {
+        if (!dayStr) return '';
+        const ORDER = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        const days  = dayStr.split(', ').map(d => d.trim()).filter(Boolean);
+        days.sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+        if (days.length === 7) return 'Everyday';
+        if (days.join(',') === 'Monday,Tuesday,Wednesday,Thursday,Friday') return 'Weekdays';
+        if (days.join(',') === 'Saturday,Sunday') return 'Weekends';
+        // Abbreviate
+        const abbr = { Monday:'Mon', Tuesday:'Tue', Wednesday:'Wed',
+                        Thursday:'Thu', Friday:'Fri', Saturday:'Sat', Sunday:'Sun' };
+        return days.map(d => abbr[d] || d).join(', ');
+    }
+
     const MONTHS = ['','January','February','March','April','May','June',
                     'July','August','September','October','November','December'];
 
@@ -468,7 +490,7 @@
             return `<li>
                 <span class="rank-num">#${i+1}</span>
                 <span class="rank-name ${isYou ? 'rank-you' : ''}">${b.name}${isYou ? ' ← You' : ''}</span>
-                <span class="rank-val">${monthClicks} clicks this month</span>
+                <span class="rank-val">${monthClicks} interactions this month</span>
             </li>`;
         }).join('');
 
@@ -481,10 +503,17 @@
                 const discount = d.discountvalue && d.discountvalue > 0
                     ? (d.discounttype === 'Percent' ? `${parseFloat(d.discountvalue)}% off` : `$${parseFloat(d.discountvalue)} off`)
                     : d.discounttype || '';
+                // Format schedule with proper day ordering
+                const start    = d.starttime ? d.starttime.slice(0,5) : '';
+                const end      = d.endtime   ? d.endtime.slice(0,5)   : '';
+                const timeStr  = start && end ? ` · ${formatTime(start)} – ${formatTime(end)}` : '';
+                const schedule = d.days ? `${formatDays(d.days)}${timeStr}` : '';
+
                 return `<div class="comp-deal">
                     <span class="comp-biz">${bizName}</span>
                     <span class="comp-discount">${discount}</span>
                     <br><span class="comp-title">${d.title}</span>
+                    ${schedule ? `<br><span style="font-size:11px;color:#6c757d;">${schedule}</span>` : ''}
                 </div>`;
             }).join('')
             : '<p style="color:#adb5bd;font-size:13px;">No competitor deals found in your category.</p>';
@@ -502,7 +531,7 @@
                     <div class="stat-grid">
                         <div class="stat-box">
                             <div class="stat-val">${totalDevices.toLocaleString()}</div>
-                            <div class="stat-lbl">Unique Devices Visited ${reportData.city} Page</div>
+                            <div class="stat-lbl">Unique Visitors to ${reportData.city} Page</div>
                         </div>
                     </div>
                     <div style="margin-top:16px;">${weeklyHTML}</div>
@@ -511,20 +540,20 @@
                 <div class="stat-section">
                     <h3>Your Engagement — ${monthName} ${year}</h3>
                     <p style="font-size:12px;color:#adb5bd;margin-bottom:12px;">
-                        ${hasMonthlyData ? 'Monthly totals from timestamped click data.' : 'No click data recorded this month yet. Showing cumulative totals.'}
+                        ${hasMonthlyData ? 'Monthly digital engagement totals.' : 'No engagement recorded this month yet. Showing cumulative totals.'}
                     </p>
                     <div class="stat-grid">
                         <div class="stat-box">
                             <div class="stat-val">${websiteClicks}</div>
-                            <div class="stat-lbl">Website Clicks</div>
+                            <div class="stat-lbl">Website Interactions</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-val">${directionsClicks}</div>
-                            <div class="stat-lbl">Directions Clicks</div>
+                            <div class="stat-lbl">Directions Interactions</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-val">${parseInt(websiteClicks) + parseInt(directionsClicks)}</div>
-                            <div class="stat-lbl">Total Clicks</div>
+                            <div class="stat-lbl">Total Interactions</div>
                         </div>
                     </div>
                     ${clickData.weekly.length ? `
@@ -567,7 +596,7 @@
                 <div class="stat-section">
                     <h3>Your Ranking in ${reportData.city} — All Businesses</h3>
                     <p style="font-size:13px;color:#6c757d;margin-bottom:12px;">
-                        Ranked #${myRankCity} of ${totalInCity} businesses by button clicks in ${monthName} ${year}.
+                        Ranked #${myRankCity} of ${totalInCity} businesses by digital interactions in ${monthName} ${year}.
                     </p>
                     <ul class="rank-list">${rankHTML}</ul>
                 </div>
@@ -583,7 +612,7 @@
                         return `<li>
                             <span class="rank-num">#${i+1}</span>
                             <span class="rank-name ${isYou ? 'rank-you' : ''}">${b.name}${isYou ? ' ← You' : ''}</span>
-                            <span class="rank-val">${monthClicks} clicks this month</span>
+                            <span class="rank-val">${monthClicks} interactions this month</span>
                         </li>`;
                     }).join('')}</ul>
                 </div>
@@ -598,10 +627,9 @@
                 </div>
 
                 <div class="disclaimer">
-                    <strong>Note on engagement tracking:</strong> Button click counts reflect tourists and first-time visitors
-                    who clicked "Visit Website" or "Get Directions." Local repeat visitors who already know your address
-                    are counted in the unique device total above but may not register button clicks. Destination Deals
-                    tracks engagement from new users primarily through button interactions.
+                    <strong>Note:</strong> Unique visitor counts include all devices that accessed your city's page.
+                    Engagement figures reflect new and returning visitors who interacted with your listing.
+                    Locals who already know your location may visit without generating additional interactions.
                 </div>
 
             </div>

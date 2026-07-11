@@ -177,8 +177,7 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Address</th>
-                    <th>City</th>
-                    <th>State</th>
+                    <th>Location</th>
                     <th>Phone</th>
                     <th>Tier</th>
                     <th>Verified</th>
@@ -188,7 +187,7 @@
                 </tr>
             </thead>
             <tbody id="businesses-tbody">
-                <tr class="empty-row"><td colspan="11">Loading businesses...</td></tr>
+                <tr class="empty-row"><td colspan="10">Loading businesses...</td></tr>
             </tbody>
         </table>
     </div>
@@ -215,7 +214,7 @@
             `${businesses.length} business${businesses.length !== 1 ? 'es' : ''}`;
 
         if (!businesses.length) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="11">No businesses match your filters.</td></tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="10">No businesses match your filters.</td></tr>';
             return;
         }
 
@@ -231,8 +230,7 @@
                 <td>${b.businessid}</td>
                 <td><strong>${b.name}</strong></td>
                 <td>${b.address || '—'}</td>
-                <td>${b.city || '—'}</td>
-                <td>${b.state || '—'}</td>
+                <td style="white-space:nowrap;">${b.city && b.state ? `${b.city}, ${b.state}` : b.city || '—'}</td>
                 <td>${b.phone || '—'}</td>
                 <td>${tierBadge}</td>
                 <td>${verifiedBadge}</td>
@@ -246,7 +244,7 @@
                 </td>
             </tr>
             <tr class="edit-row" id="edit-row-${b.businessid}" style="display:none;">
-                <td colspan="11">
+                <td colspan="10">
                     <div class="edit-panel">
                         <h4>Editing: ${b.name}</h4>
                         <div class="edit-grid">
@@ -401,7 +399,7 @@
             applyFilters();
         } catch (e) {
             document.getElementById('businesses-tbody').innerHTML =
-                '<tr class="empty-row"><td colspan="11">Could not load businesses. Is the server running?</td></tr>';
+                '<tr class="empty-row"><td colspan="10">Could not load businesses. Is the server running?</td></tr>';
         }
     }
 

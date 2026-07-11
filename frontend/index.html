@@ -3,10 +3,15 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
+    <meta name="color-scheme" content="light">
     <title>Destination Deals</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<!-- Background layers (cross-browser) -->
+<div id="bgLayer"></div>
+<div id="bgOverlay"></div>
 
 <!-- ── Nav bar ── -->
 <nav class="consumer-nav" id="consumerNav">
@@ -131,9 +136,9 @@
         document.getElementById('daySelect').value      = '';
         document.getElementById('searchInput').value    = '';
         document.getElementById('sortSelect').value     = 'default';
-        // Reset background to default
-        document.body.style.backgroundImage =
-            `linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)), url('images/default_background.png')`;
+        // Reset background to default via bgLayer div
+        const bg = document.getElementById('bgLayer');
+        if (bg) bg.style.backgroundImage = "url('images/default_background.png')";
         // Trigger welcome state in app.js
         if (typeof showWelcomeState === 'function') showWelcomeState();
     }

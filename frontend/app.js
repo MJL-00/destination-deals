@@ -127,8 +127,8 @@ const DEFAULT_BACKGROUND = 'images/default_background.png';
 
 function setBackgroundForState(stateCode) {
     const img = STATE_BACKGROUNDS[stateCode?.toUpperCase()] || DEFAULT_BACKGROUND;
-    document.body.style.backgroundImage =
-        `linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)), url('${img}')`;
+    const bg = document.getElementById('bgLayer');
+    if (bg) bg.style.backgroundImage = `url('${img}')`;
 }
 
 async function loadDealsForCity(city) {
@@ -212,8 +212,8 @@ locationSelect.addEventListener('change', () => {
     if (!city) {
         showWelcomeState();
         // Reset to default background when no city selected
-        document.body.style.backgroundImage =
-            `linear-gradient(rgba(255,255,255,.72), rgba(255,255,255,.72)), url('images/default_background.png')`;
+        const bg = document.getElementById('bgLayer');
+        if (bg) bg.style.backgroundImage = "url('images/default_background.png')";
         return;
     }
     // Swap background immediately from the city->state map
