@@ -41,17 +41,6 @@
         </p>
     </div>
 
-    <!-- Location permission banner -->
-    <div class="location-banner" id="locationBanner">
-        <span class="location-banner-icon">📍</span>
-        <div class="location-banner-text">
-            <strong>See deals closest to you</strong>
-            <span>Allow location access to automatically sort deals by distance from where you are.</span>
-        </div>
-        <button class="location-allow-btn" id="allowLocationBtn">Allow</button>
-        <button class="location-dismiss-btn" id="dismissLocationBtn">Not now</button>
-    </div>
-
     <!-- Filters -->
     <div class="filters" id="filtersBar">
         <div class="filter-group">
@@ -79,22 +68,16 @@
                 <option>Saturday</option>
             </select>
         </div>
-        <div class="filter-group search-group">
+        <div class="filter-group search-group" id="searchGroup" style="display:none;">
             <label>Search</label>
             <input
                 type="text"
                 id="searchInput"
-                placeholder="Business or deal name..."
+                placeholder="Search by business, street, or deal name..."
                 autocomplete="off">
             <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
         </div>
-        <div class="filter-group sort-group">
-            <label>Sort by</label>
-            <select id="sortSelect">
-                <option value="default">Featured</option>
-                <option value="nearest">Closest to Me</option>
-            </select>
-        </div>
+
     </div>
 
     <!-- Result count + filter tags -->
@@ -135,7 +118,8 @@
         document.getElementById('categorySelect').value = '';
         document.getElementById('daySelect').value      = '';
         document.getElementById('searchInput').value    = '';
-        document.getElementById('sortSelect').value     = 'default';
+        const ss = document.getElementById('sortSelect');
+        if (ss) ss.value = 'default';
         // Reset background to default via bgLayer div
         const bg = document.getElementById('bgLayer');
         if (bg) bg.style.backgroundImage = "url('images/default_background.png')";

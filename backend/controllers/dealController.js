@@ -423,16 +423,23 @@ const getDealById = async (req, res) => {
                 d.*,
                 b.name AS business_name,
                 STRING_AGG(DISTINCT c.categoryname, ', ') AS categories,
-                STRING_AGG(DISTINCT ds.dayofweek, ', '
-                    ORDER BY CASE ds.dayofweek
-                        WHEN 'Monday'    THEN 1
-                        WHEN 'Tuesday'   THEN 2
-                        WHEN 'Wednesday' THEN 3
-                        WHEN 'Thursday'  THEN 4
-                        WHEN 'Friday'    THEN 5
-                        WHEN 'Saturday'  THEN 6
-                        WHEN 'Sunday'    THEN 7
-                    END) AS days,
+                (SELECT STRING_AGG(day_ordered, ', ')
+                 FROM (
+                     SELECT DISTINCT ds2.dayofweek AS day_ordered,
+                         CASE ds2.dayofweek
+                             WHEN 'Monday'    THEN 1
+                             WHEN 'Tuesday'   THEN 2
+                             WHEN 'Wednesday' THEN 3
+                             WHEN 'Thursday'  THEN 4
+                             WHEN 'Friday'    THEN 5
+                             WHEN 'Saturday'  THEN 6
+                             WHEN 'Sunday'    THEN 7
+                         END AS day_order
+                     FROM dealschedule ds2
+                     WHERE ds2.dealid = d.dealid
+                     ORDER BY day_order
+                 ) ordered_days
+                ) AS days,
                 MIN(ds.starttime) AS starttime,
                 MAX(ds.endtime)   AS endtime
             FROM deal d
@@ -463,16 +470,23 @@ const getAllDealsEnriched = async (req, res) => {
                 l.city,
                 l.state,
                 STRING_AGG(DISTINCT c.categoryname, ', ') AS categories,
-                STRING_AGG(DISTINCT ds.dayofweek, ', '
-                    ORDER BY CASE ds.dayofweek
-                        WHEN 'Monday'    THEN 1
-                        WHEN 'Tuesday'   THEN 2
-                        WHEN 'Wednesday' THEN 3
-                        WHEN 'Thursday'  THEN 4
-                        WHEN 'Friday'    THEN 5
-                        WHEN 'Saturday'  THEN 6
-                        WHEN 'Sunday'    THEN 7
-                    END) AS days,
+                (SELECT STRING_AGG(day_ordered, ', ')
+                 FROM (
+                     SELECT DISTINCT ds2.dayofweek AS day_ordered,
+                         CASE ds2.dayofweek
+                             WHEN 'Monday'    THEN 1
+                             WHEN 'Tuesday'   THEN 2
+                             WHEN 'Wednesday' THEN 3
+                             WHEN 'Thursday'  THEN 4
+                             WHEN 'Friday'    THEN 5
+                             WHEN 'Saturday'  THEN 6
+                             WHEN 'Sunday'    THEN 7
+                         END AS day_order
+                     FROM dealschedule ds2
+                     WHERE ds2.dealid = d.dealid
+                     ORDER BY day_order
+                 ) ordered_days
+                ) AS days,
                 MIN(ds.starttime) AS starttime,
                 MAX(ds.endtime)   AS endtime
             FROM deal d

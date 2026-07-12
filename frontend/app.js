@@ -4,9 +4,7 @@
 
 // ── State ────────────────────────────────────────────────────
 let allDeals        = [];
-let userLat         = null;
-let userLng         = null;
-let locationGranted = false;
+
 let dealsLoaded     = false;
 
 // ── Device ID (persistent per browser for page view tracking) ─
@@ -25,66 +23,18 @@ const locationSelect = document.getElementById('locationSelect');
 const categorySelect = document.getElementById('categorySelect');
 const daySelect      = document.getElementById('daySelect');
 const searchInput    = document.getElementById('searchInput');
-const sortSelect     = document.getElementById('sortSelect');
+const sortSelect     = document.getElementById('sortSelect') || { value: 'default', addEventListener: () => {} };
 const results        = document.getElementById('results');
 const resultsHeader  = document.getElementById('resultsHeader');
 const dealCount      = document.getElementById('dealCount');
 const filterTags     = document.getElementById('filterTags');
 const autocomplete   = document.getElementById('autocompleteDropdown');
-const locationBanner = document.getElementById('locationBanner');
-const allowBtn       = document.getElementById('allowLocationBtn');
-const dismissBtn     = document.getElementById('dismissLocationBtn');
-
-// ── Haversine distance (miles) ────────────────────────────────
-function haversine(lat1, lng1, lat2, lng2) {
-    const la2 = parseFloat(lat2);
-    const lo2 = parseFloat(lng2);
-    if (isNaN(la2) || isNaN(lo2)) return null;
-    const R    = 3958.8;
-    const dLat = (la2 - lat1) * Math.PI / 180;
-    const dLng = (lo2 - lng1) * Math.PI / 180;
-    const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(la2  * Math.PI / 180) *
-        Math.sin(dLng / 2) ** 2;
-    return R * 2 * Math.asin(Math.sqrt(a));
-}
+const locationBanner = document.getElementById('locationBanner') || { style: {} };
 
 // ── Location permission flow ──────────────────────────────────
-function requestLocation() {
-    if (!navigator.geolocation) {
-        // No geolocation support — reset sort and hide banner
-        sortSelect.value = 'default';
-        locationBanner.style.display = 'none';
-        return;
-    }
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            userLat = pos.coords.latitude;
-            userLng = pos.coords.longitude;
-            locationGranted = true;
-            locationBanner.style.display = 'none';
-            if (dealsLoaded) {
-                sortSelect.value = 'nearest';
-                applyFilters();
-            }
-        },
-        () => {
-            // Denied or unavailable — reset sort, show message in banner
-            sortSelect.value = 'default';
-            locationBanner.style.display = 'none';
-            if (dealsLoaded) applyFilters();
-        }
-    );
-}
 
-allowBtn.addEventListener('click', () => {
-    requestLocation(); // banner hides in success callback once location confirmed
-});
-dismissBtn.addEventListener('click', () => {
-    locationBanner.style.display = 'none';
-});
+
+
 
 // ── Load dropdowns ────────────────────────────────────────────
 // city name (lowercase) -> state code, built from locations API
@@ -146,6 +96,7 @@ async function loadDealsForCity(city) {
             body: JSON.stringify({ city, state, device_id: getDeviceId() })
         }).catch(() => {});
 
+        document.getElementById('searchGroup').style.display = '';
         applyFilters();
     } catch (e) {
         results.innerHTML = '<div class="welcome-card"><p>Could not load deals. Please try again.</p></div>';
@@ -157,6 +108,7 @@ async function loadDealsForCity(city) {
 function showWelcomeState() {
     allDeals    = [];
     dealsLoaded = false;
+    document.getElementById('searchGroup').style.display = 'none';
     resultsHeader.style.display = 'none';
     results.innerHTML = '';
 }
@@ -248,25 +200,12 @@ function applyFilters() {
         const matchSearch = !search ||
             (d.name        || '').toLowerCase().includes(search) ||
             (d.title       || '').toLowerCase().includes(search) ||
-            (d.description || '').toLowerCase().includes(search);
+            (d.description || '').toLowerCase().includes(search) ||
+            (d.address     || '').toLowerCase().includes(search);
 
         return matchCat && matchDay && matchSearch;
     });
-
-    // Attach distance
-    filtered = filtered.map(d => ({
-        ...d,
-        distance: locationGranted && d.latitude && d.longitude
-            ? haversine(userLat, userLng, d.latitude, d.longitude)
-            : null
-    }));
-
-    // Sort — nearest only alternative, Featured is default tiered random
-    if (sort === 'nearest') {
-        if (locationGranted) {
-            filtered.sort((a, b) => (a.distance ?? 9999) - (b.distance ?? 9999));
-        }
-    }
+// Sort — Featured is default (tiered random, handled in groupByBusiness)
 
     const grouped = groupByBusiness(filtered);
     displayDeals(filtered, grouped);
@@ -299,7 +238,6 @@ function groupByBusiness(deals) {
                 website:           deal.website,
                 latitude:          deal.latitude,
                 longitude:         deal.longitude,
-                distance:          deal.distance,
                 outdoor_dining:    deal.outdoor_dining || false,
                 live_music:        deal.live_music     || false,
                 waterfront:        deal.waterfront     || false,
@@ -347,12 +285,6 @@ function formatTime(t) {
     if (!t) return '';
     const d = new Date(`1970-01-01T${t}`);
     return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-}
-
-function formatDistance(miles) {
-    if (miles == null || isNaN(miles)) return '';
-    if (miles < 0.1) return '< 0.1 mi';
-    return `${miles.toFixed(1)} mi`;
 }
 
 function formatDiscount(deal) {
@@ -408,7 +340,6 @@ function displayDeals(deals, grouped) {
     results.innerHTML = grouped.map((biz, i) => {
         const cardId   = `card-${i}`;
         const fullAddr = `${biz.address || ''}, ${biz.city || ''}, ${biz.state || ''}`;
-        const distText = formatDistance(biz.distance);
         const dealWord = biz.deals.length === 1 ? '1 deal' : `${biz.deals.length} deals`;
 
         const previewLines = biz.deals.map(d => {
@@ -450,7 +381,7 @@ function displayDeals(deals, grouped) {
                     <div class="card-preview-block">${previewLines}</div>
                 </div>
                 <div class="card-summary-right">
-                    ${distText ? `<span class="distance-badge">📍 ${distText}</span>` : ''}
+
                     <button class="expand-btn" id="icon-${cardId}" aria-label="Expand">▾</button>
                 </div>
             </div>
@@ -568,28 +499,7 @@ function checkUrlParams() {
 // ── Secondary filter listeners ────────────────────────────────
 categorySelect.addEventListener('change', applyFilters);
 daySelect.addEventListener('change', applyFilters);
-sortSelect.addEventListener('change', () => {
-    if (sortSelect.value === 'nearest' && !locationGranted) {
-        // Check if permission already granted — if so, get location silently
-        if (navigator.permissions) {
-            navigator.permissions.query({ name: 'geolocation' }).then(result => {
-                if (result.state === 'granted') {
-                    // Already allowed — get location silently, no banner
-                    requestLocation();
-                } else {
-                    // Prompt or denied — show banner so user understands why
-                    locationBanner.style.display = 'flex';
-                    requestLocation();
-                }
-            });
-        } else {
-            // Fallback for browsers without permissions API
-            locationBanner.style.display = 'flex';
-            requestLocation();
-        }
-    }
-    applyFilters();
-});
+sortSelect.addEventListener('change', applyFilters);
 
 // ── Init ──────────────────────────────────────────────────────
 Promise.all([loadLocations(), loadCategories()])
