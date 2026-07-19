@@ -761,11 +761,16 @@
         const p = allProspects.find(x => x.prospectid === id);
         if (!p) return;
         // Pre-fill add-business form via URL params and open it
+        // Ensure website has https:// prefix for the add-business form
+        let website = p.website || '';
+        if (website && !website.startsWith('http')) {
+            website = 'https://' + website;
+        }
         const params = new URLSearchParams({
             name:    p.business_name,
             address: p.address || '',
             phone:   p.phone   || '',
-            website: p.website || '',
+            website: website,
         });
         window.location.href = `add-business.html?${params.toString()}`;
     }

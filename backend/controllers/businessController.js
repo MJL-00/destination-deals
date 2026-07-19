@@ -59,12 +59,41 @@ const createBusiness = async (req, res) => {
     const { name, address, locationid, phone, website, subscription_tier, latitude, longitude, outdoor_dining, live_music, waterfront, pet_friendly, categoryIds } = req.body;
 
     let formattedWebsite = website ? website.trim() : null;
+    if (formattedWebsite && !formattedWebsite.startsWith('http')) {
+        formattedWebsite = 'https://' + formattedWebsite;
+    }
     if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
         formattedWebsite = `https://${formattedWebsite}`;
     }
 
     if (!name || !address || !locationid || !categoryIds || categoryIds.length === 0) {
         return res.status(400).json({ error: "Storefront Name, Street Address, Region City, and Categories are all fully required." });
+    }
+
+    // Duplicate check — skipped if admin passes force:true
+    const force = req.body.force === true || req.body.force === 'true';
+    if (!force) {
+        try {
+            const dupCheck = await pool.query(`
+                SELECT b.businessid, b.name, l.city, l.state
+                FROM business b
+                JOIN businesslocation bl ON b.businessid = bl.businessid
+                JOIN location l ON bl.locationid = l.locationid
+                WHERE LOWER(b.name) = LOWER($1) AND bl.locationid = $2
+                LIMIT 1
+            `, [name, locationid]);
+
+            if (dupCheck.rows.length > 0) {
+                const existing = dupCheck.rows[0];
+                return res.status(409).json({
+                    error: 'duplicate',
+                    message: `A business named "${existing.name}" already exists in ${existing.city}, ${existing.state}.`,
+                    existing
+                });
+            }
+        } catch (dupErr) {
+            console.error('Duplicate check error:', dupErr);
+        }
     }
 
     const client = await pool.connect();
@@ -114,6 +143,9 @@ const updateBusiness = async (req, res) => {
     const { name, address, phone, website, subscription_tier, is_verified, latitude, longitude, outdoor_dining, live_music, waterfront, pet_friendly, categoryIds } = req.body;
 
     let formattedWebsite = website ? website.trim() : null;
+    if (formattedWebsite && !formattedWebsite.startsWith('http')) {
+        formattedWebsite = 'https://' + formattedWebsite;
+    }
     if (formattedWebsite && !/^https?:\/\//i.test(formattedWebsite)) {
         formattedWebsite = `https://${formattedWebsite}`;
     }

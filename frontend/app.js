@@ -67,13 +67,13 @@ async function loadCategories() {
 // ── Load deals for a specific city only ───────────────────────
 // ── Background swap by state ────────────────────────────────────────────
 const STATE_BACKGROUNDS = {
-    'CT': 'images/ct.png',
-    'MA': 'images/ma.png',
-    'NY': 'images/ny.png',
-    'RI': 'images/ri.png',
-    'VT': 'images/vt.png',
+    'CT': 'images/backgrounds/ct.png',
+    'MA': 'images/backgrounds/ma.png',
+    'NY': 'images/backgrounds/ny.png',
+    'RI': 'images/backgrounds/ri.png',
+    'VT': 'images/backgrounds/vt.png',
 };
-const DEFAULT_BACKGROUND = 'images/default_background.png';
+const DEFAULT_BACKGROUND = 'images/backgrounds/default_background.png';
 
 function setBackgroundForState(stateCode) {
     const img = STATE_BACKGROUNDS[stateCode?.toUpperCase()] || DEFAULT_BACKGROUND;
@@ -165,7 +165,7 @@ locationSelect.addEventListener('change', () => {
         showWelcomeState();
         // Reset to default background when no city selected
         const bg = document.getElementById('bgLayer');
-        if (bg) bg.style.backgroundImage = "url('images/default_background.png')";
+        if (bg) bg.style.backgroundImage = "url('images/backgrounds/default_background.png')";
         return;
     }
     // Swap background immediately from the city->state map
