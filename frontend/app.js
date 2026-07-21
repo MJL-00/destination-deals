@@ -489,6 +489,9 @@ function checkUrlParams() {
     const match   = options.find(o => o.value.toLowerCase() === city.toLowerCase());
     if (match) {
         locationSelect.value = match.value;
+        // Swap background immediately for QR code loads
+        const cityState = cityStateMap[match.value.toLowerCase()];
+        if (cityState) setBackgroundForState(cityState);
         loadDealsForCity(match.value);
         // QR code load — no location banner shown automatically
         return true;

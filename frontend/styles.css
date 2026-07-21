@@ -596,6 +596,9 @@ select:focus, input[type="text"]:focus {
     background-size: 450px 450px;
     background-repeat: repeat;
 }
+@media (max-width: 600px) {
+    #bgLayer { background-size: 280px 280px; }
+}
 #bgOverlay {
     position: fixed;
     top: 0; left: 0;
